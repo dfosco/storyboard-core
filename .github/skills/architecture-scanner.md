@@ -8,7 +8,15 @@ Generates documentation files in `.github/architecture/` that describe every arc
 
 ## How to Execute
 
-### Step 1: Run the manifest script
+### Step 1: Discover files
+
+```bash
+.github/scripts/scan-architecture.sh --discover
+```
+
+This scans the repo using discovery rules and updates the `PATTERNS` list inside the script itself. Run this first to ensure the file list is current.
+
+### Step 2: Get the manifest
 
 ```bash
 .github/scripts/scan-architecture.sh --manifest
@@ -16,7 +24,7 @@ Generates documentation files in `.github/architecture/` that describe every arc
 
 This outputs a JSON array of files to document, with their category and importance level. Use this as the authoritative list — do NOT manually pick files.
 
-### Step 2: Generate documentation for each file
+### Step 3: Generate documentation for each file
 
 For each entry in the manifest, create (or update) a markdown file at:
 
@@ -69,7 +77,7 @@ importance: {importance}
 - For `low` importance files, keep docs brief (Goal + Composition only, skip Notes)
 - For `high` importance files, be thorough
 
-### Step 3: Generate the index
+### Step 4: Generate the index
 
 ```bash
 .github/scripts/scan-architecture.sh --index
@@ -77,15 +85,15 @@ importance: {importance}
 
 This reads the generated doc files and creates `architecture.index.md` with a categorized table of contents.
 
-### Step 4: Verify
+### Step 5: Verify
 
 - Confirm every file in the manifest has a corresponding `.md` doc
 - Confirm `architecture.index.md` links to all docs
 - Confirm every doc has a backlink to the index
 
-### Step 5: Commit
+### Step 6: Commit
 
 ```bash
-git add .github/architecture/
+git add .github/architecture/ .github/scripts/scan-architecture.sh
 git commit -m "Update architecture documentation"
 ```
