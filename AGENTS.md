@@ -1,5 +1,9 @@
 # Copilot Instructions
 
+Before running any other instruction, evaluate if the user prompt contains a trigger for one or more skills in `.github/skills`
+
+---
+
 ## Build & Development
 
 ```bash
@@ -49,7 +53,7 @@ Pages typically use the `Application` template which provides:
 ## Skills
 
 - **Primer Primitives** (`.github/skills/primer-primitives.md`) — Complete reference of all `@primer/primitives` CSS design tokens (sizes, typography, borders, breakpoints, controls, motion). **Always consult this skill file when working on Primer layout or CSS styling** to use correct token names.
-- **Architecture Scanner** (`.github/skills/architecture-scanner.md`) — Scans the codebase and generates architecture documentation in `.github/architecture/`. Invoke with: "scan the codebase architecture", "update the architecture", "update arch".
+- **Architecture Scanner** (`.github/skills/architecture-scanner/architecture-scanner.md`) — Scans the codebase and generates architecture documentation in `.github/architecture/`. Invoke with: "scan the codebase architecture", "update the architecture", "update arch".
 
 ## Storyboard Data System
 
