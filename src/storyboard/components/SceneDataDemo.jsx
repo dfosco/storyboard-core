@@ -1,5 +1,5 @@
 import { Text } from '@primer/react'
-import { useSceneData, useSceneLoading } from '../hooks/useSceneData.js'
+import { useSceneData } from '../hooks/useSceneData.js'
 import styles from './SceneDebug.module.css'
 
 /**
@@ -7,11 +7,8 @@ import styles from './SceneDebug.module.css'
  * through the hook API instead of loading directly.
  */
 export default function SceneDataDemo() {
-  const loading = useSceneLoading()
-  const user = useSceneData('user')
-  const navigation = useSceneData('navigation')
-
-  if (loading) return <Text>Loading scene data…</Text>
+  const scene = useSceneData()
+  const { user } = scene
 
   return (
     <div className={styles.container}>
@@ -33,7 +30,7 @@ export default function SceneDataDemo() {
       <section>
         <Text as="h3" fontWeight="bold">Navigation</Text>
         <pre className={styles.codeBlock}>
-          {navigation.primary.map((item) => item.label).join(' · ')}
+          {scene.navigation.primary.map((item) => item.label).join(' · ')}
         </pre>
       </section>
     </div>

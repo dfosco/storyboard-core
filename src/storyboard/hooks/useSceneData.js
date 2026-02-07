@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { StoryboardContext } from '../context.jsx'
+import { StoryboardContext } from '../StoryboardContext.js'
 import { getByPath } from '../core/dotPath.js'
 
 /**
