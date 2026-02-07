@@ -115,6 +115,31 @@ const data = await loadScene('other-scene') // loads src/data/scenes/other-scene
 
 A debug component that renders resolved scene data as formatted JSON. It reads the scene name from a `?scene=` URL parameter, a `sceneName` prop, or defaults to `"default"`.
 
+### StoryboardProvider & useSceneData Hook
+
+The `StoryboardProvider` wraps the app and loads scene data into React context. Components access scene data via the `useSceneData` hook with dot-notation paths:
+
+```jsx
+import { useSceneData, useSceneLoading } from '../storyboard'
+
+// Access nested data with dot-notation
+const user = useSceneData('user')
+const userName = useSceneData('user.profile.name')
+const firstProject = useSceneData('projects.0')
+const allData = useSceneData() // entire scene object
+
+const loading = useSceneLoading() // true while loading
+```
+
+The provider reads the scene name from `?scene=` URL param, a `sceneName` prop, or defaults to `"default"`.
+
+**Public exports** from `src/storyboard/index.js`:
+- `StoryboardProvider` — React context provider
+- `useSceneData(path?)` — Access scene data by dot-notation path
+- `useSceneLoading()` — Returns true while scene is loading
+- `getByPath(obj, path)` — Dot-notation path utility
+- `loadScene(sceneName)` — Low-level scene loader
+
 ### Creating New Data
 
 1. **New object**: Add a `.json` file to `src/data/objects/`. Structure it however you need.

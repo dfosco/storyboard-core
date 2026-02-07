@@ -141,6 +141,30 @@ You need to change a few settings on GitHub.com for your prototype to be deploye
 -   🚀 No need to set up a new react project, just instantly start prototyping
 -   🧪 You want to learn React
 
+## Storyboard Data System
+
+This app includes a data system for driving prototypes with JSON scene files.
+
+- **Scene files** (`src/data/scenes/`) define the data context for each prototype state
+- **Object files** (`src/data/objects/`) contain reusable data fragments
+- Scenes reference objects using `$ref` (inline replacement) and `$global` (root-level merge)
+- Data files support JSONC (comments allowed with `//` and `/* */`)
+
+### Usage
+
+Wrap your app in `<StoryboardProvider>` (already configured), then access data in any component:
+
+```jsx
+import { useSceneData } from '../storyboard'
+
+const user = useSceneData('user')
+const userName = useSceneData('user.profile.name')
+```
+
+Switch scenes via the `?scene=` URL parameter (e.g., `?scene=other-scene`).
+
+See `.github/plans/storyboard.implementation.plan.md` for full architecture details.
+
 ## Tips and Tricks
 
 - Use [Primer React](https://primer.style/components) components to build your layouts, or check [Primer Templates](https://ui.githubapp.com/storybook/?path=/docs/templates-readme--docs&globals=viewport:narrow) (staff only) to get a starting point.

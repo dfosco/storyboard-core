@@ -86,10 +86,10 @@ A utility function that takes an object and a dot-notation path, returning the v
 - Returns `undefined` for invalid paths (no errors thrown)
 
 ### Deliverables
-- [ ] Context module: `src/storyboard/context.jsx`
-- [ ] Dot path utility: `src/storyboard/core/dotPath.js`
-- [ ] useSceneData hook: `src/storyboard/hooks/useSceneData.js`
-- [ ] Wrap app in `<StoryboardProvider>`
+- [x] Context module: `src/storyboard/context.jsx`
+- [x] Dot path utility: `src/storyboard/core/dotPath.js`
+- [x] useSceneData hook: `src/storyboard/hooks/useSceneData.js`
+- [x] Wrap app in `<StoryboardProvider>`
 
 ### Visual Feedback
 Replace the debug JSON dump with a real component that uses `useSceneData()` to display user info, project list, etc. Data flows through hooks instead of being hardcoded.

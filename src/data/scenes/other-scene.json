@@ -1,5 +1,5 @@
 {
-  "$global": ["../objects/navigation"],
+  "navigation": { "$ref": "../objects/navigation" },
   "user": {
     "name": "John Doe",
     "username": "johndoe",

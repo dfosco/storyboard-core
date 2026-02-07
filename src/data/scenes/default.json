@@ -1,6 +1,6 @@
 {
-  // "$global": ["../objects/navigation"],
   "user": { "$ref": "../objects/jane-doe" },
+  "navigation": { "$ref": "../objects/navigation" },
   "projects": [
     {
       "id": 1,
