@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
+import { useSearchParams } from 'react-router-dom'
 import { Text } from '@primer/react'
 import { loadScene } from '../core/loader.js'
 import styles from './SceneDebug.module.css'
@@ -6,8 +8,13 @@ import styles from './SceneDebug.module.css'
 /**
  * Debug component that displays loaded scene data as formatted JSON.
  * Used to verify the loader is working correctly.
+ * Reads scene name from URL param (?scene=name) or uses prop/default.
  */
-export default function SceneDebug({ sceneName = 'default' }) {
+export default function SceneDebug({ sceneName } = {}) {
+  const [searchParams] = useSearchParams()
+  const sceneFromUrl = searchParams.get('scene')
+  const activeSceneName = sceneName || sceneFromUrl || 'default'
+  
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -16,7 +23,7 @@ export default function SceneDebug({ sceneName = 'default' }) {
     setLoading(true)
     setError(null)
     
-    loadScene(sceneName)
+    loadScene(activeSceneName)
       .then((sceneData) => {
         setData(sceneData)
         setLoading(false)
@@ -25,12 +32,12 @@ export default function SceneDebug({ sceneName = 'default' }) {
         setError(err.message)
         setLoading(false)
       })
-  }, [sceneName])
+  }, [activeSceneName])
 
   if (loading) {
     return (
       <div className={styles.container}>
-        <Text>Loading scene: {sceneName}...</Text>
+        <Text>Loading scene: {activeSceneName}...</Text>
       </div>
     )
   }
@@ -46,10 +53,14 @@ export default function SceneDebug({ sceneName = 'default' }) {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Scene: {sceneName}</h2>
+      <h2 className={styles.title}>Scene: {activeSceneName}</h2>
       <pre className={styles.codeBlock}>
         {JSON.stringify(data, null, 2)}
       </pre>
     </div>
   )
+}
+
+SceneDebug.propTypes = {
+  sceneName: PropTypes.string,
 }

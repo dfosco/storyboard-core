@@ -82,14 +82,45 @@ Option B - Drop root-level merging entirely. Reference objects where you need th
 ---
 
 ## Decision
-TBD - prototype the `$ref` approach to evaluate ergonomics.
+
+Use **`$ref`** for inline object replacement and **`$global`** for root-level merging.
+
+### `$ref` — Inline Replacement
+Replace the containing object with the contents of the referenced file. Works at any nesting level.
+```json
+{
+  "user": { "$ref": "../objects/user" },
+  "settings": {
+    "owner": { "$ref": "../objects/user" }
+  }
+}
+```
+
+### `$global` — Root-Level Merge
+Merge referenced files into the root of the scene data. Scene values win on conflicts.
+```json
+{
+  "$global": ["../objects/navigation", "../objects/footer"],
+  "user": { "$ref": "../objects/user" }
+}
+```
+
+### Path Resolution
+All paths are **relative to the file containing the reference**, with `.json` extension appended automatically.
+
+Example from `/data/scenes/default.json`:
+```
+"../objects/user"  →  /data/objects/user.json
+```
+
+This replaces the original `$import` mechanism.
 
 ---
 
 ## File Structure (Proposed)
 
 ```
-/src/data/
+/public/data/
   ├── objects/           # reusable data objects
   │   ├── user.json
   │   ├── navigation.json

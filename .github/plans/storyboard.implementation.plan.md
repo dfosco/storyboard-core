@@ -39,10 +39,10 @@ The file can import shared data using `$import`:
 - Scene data takes priority over imported data
 
 ### Deliverables
-- [ ] Sample scene file: `/public/data/scenes/default.json`
-- [ ] Sample shared file: `/public/data/shared/navigation.json`
-- [ ] Loader module: `src/storyboard/core/loader.js`
-- [ ] Debug component that displays loaded JSON
+- [x] Sample scene file: `/public/data/scenes/default.json`
+- [x] Sample shared file: `/public/data/shared/navigation.json`
+- [x] Loader module: `src/storyboard/core/loader.js`
+- [x] Debug component that displays loaded JSON
 
 ### Visual Feedback
 A `<SceneDebug />` component renders the loaded scene data as formatted JSON on the page. Confirms loading and merging work correctly.

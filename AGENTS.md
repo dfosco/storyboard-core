@@ -41,6 +41,15 @@ Pages typically use the `Application` template which provides:
 </Application>
 ```
 
+## Prime Anti-patterns to Avoid
+
+- Do NOT use `<Box>` components
+- Do NOT use `sx` styled-components
+
+## Skills
+
+- **Primer Primitives** (`.github/skills/primer-primitives.md`) — Complete reference of all `@primer/primitives` CSS design tokens (sizes, typography, borders, breakpoints, controls, motion). **Always consult this skill file when working on Primer layout or CSS styling** to use correct token names.
+
 ## Key Conventions
 
 - Use **Primer React** components from `@primer/react` for all UI elements
