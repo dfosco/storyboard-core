@@ -7,8 +7,8 @@
 #
 # Usage: .github/skills/architecture-scanner/scan.sh [--discover | --manifest | --stale | --index]
 #   --discover  Scan repo, create/update files.json (preserves user-set priorities)
-#   --manifest  Print JSON array of non-low files to document
-#   --stale     Print manifest of files needing doc updates (missing or stale)
+#   --manifest  Print JSON array of non-low files to document (full scan)
+#   --stale     Print manifest of files changed since last architecture commit (incremental)
 #   --index     Generate .github/architecture/architecture.index.md from existing docs
 
 set -euo pipefail
@@ -216,7 +216,7 @@ print_stale() {
     exit 1
   fi
   python3 -c "
-import json, os
+import json, os, subprocess, sys
 
 files_json = '$FILES_JSON'
 arch_dir = '$ARCH_DIR'
@@ -229,10 +229,47 @@ files = data.get('files', data) if isinstance(data, dict) else data
 categories = data.get('categories', []) if isinstance(data, dict) else []
 cat_map = {c['id']: c for c in categories}
 
+# Find the most recent commit that touched .github/architecture/
+try:
+    last_arch_commit = subprocess.check_output(
+        ['git', 'log', '-1', '--format=%H', '--', '.github/architecture/'],
+        cwd=repo_root, text=True
+    ).strip()
+except subprocess.CalledProcessError:
+    last_arch_commit = ''
+
+# Get list of source files changed since that commit (or all if no commit)
+changed_files = set()
+if last_arch_commit:
+    try:
+        diff_output = subprocess.check_output(
+            ['git', 'diff', '--name-only', last_arch_commit, 'HEAD'],
+            cwd=repo_root, text=True
+        ).strip()
+        if diff_output:
+            changed_files = set(diff_output.splitlines())
+        # Also include uncommitted changes (staged + unstaged)
+        diff_wt = subprocess.check_output(
+            ['git', 'diff', '--name-only', 'HEAD'],
+            cwd=repo_root, text=True
+        ).strip()
+        if diff_wt:
+            changed_files.update(diff_wt.splitlines())
+        diff_staged = subprocess.check_output(
+            ['git', 'diff', '--name-only', '--cached'],
+            cwd=repo_root, text=True
+        ).strip()
+        if diff_staged:
+            changed_files.update(diff_staged.splitlines())
+    except subprocess.CalledProcessError:
+        changed_files = set()
+
 results = []
+total_non_low = 0
 for entry in files:
     if entry.get('importance') == 'low':
         continue
+    total_non_low += 1
     src = os.path.join(repo_root, entry['path'])
     doc = os.path.join(arch_dir, entry['path'] + '.md')
     if not os.path.isfile(src):
@@ -240,16 +277,26 @@ for entry in files:
     status = None
     if not os.path.isfile(doc):
         status = 'missing'
-    else:
-        if os.path.getmtime(src) > os.path.getmtime(doc):
-            status = 'stale'
+    elif not last_arch_commit:
+        # No architecture commits exist yet — everything is stale
+        status = 'stale'
+    elif entry['path'] in changed_files:
+        status = 'stale'
     if status:
         e = {**entry, 'doc': entry['path'] + '.md', 'status': status}
         cat = cat_map.get(entry.get('category'), {})
         e['category_priority'] = cat.get('priority', 'normal')
         results.append(e)
 
-print(json.dumps(results, indent=2))
+# Suggest full scan if >50% of files are stale
+if total_non_low > 0 and len(results) > total_non_low * 0.5:
+    print(json.dumps({
+        'suggestion': 'full_scan',
+        'message': f'{len(results)} of {total_non_low} documented files need updates. Consider running --manifest for a full scan instead.',
+        'files': results
+    }, indent=2))
+else:
+    print(json.dumps(results, indent=2))
 "
 }
 
@@ -321,8 +368,8 @@ case "${1:-}" in
   *)
     echo "Usage: $0 [--discover | --manifest | --stale | --index]"
     echo "  --discover  Scan repo and create/update files.json (preserves priorities)"
-    echo "  --manifest  Print JSON manifest of non-low files to document"
-    echo "  --stale     Print manifest of files needing doc updates (missing or stale)"
+    echo "  --manifest  Print JSON manifest of non-low files to document (full scan)"
+    echo "  --stale     Print manifest of files changed since last architecture commit (incremental)"
     echo "  --index     Generate architecture index from existing docs"
     exit 1
     ;;
