@@ -5,56 +5,46 @@
 
 ## Storyboard System
 
-The storyboard system separates prototype data from UI components, enabling the same interface to render with different data by switching scenes via a URL parameter (`?scene=name`). It has three layers: a **data layer** (JSON files in `src/data/`), a **loader** that resolves references at build time, and a **React context + hooks** layer that delivers resolved data to components.
+The storyboard system is the data architecture of this prototype app. It provides two layers of state management: **scene data** (read-only JSON loaded from files) and **session state** (read-write URL hash-based overrides).
 
-The data flow starts with [`src/storyboard/core/loader.js`](./src/storyboard/core/loader.js.md), which uses Vite's `import.meta.glob` to eagerly bundle all JSON/JSONC files under `src/data/` at build time. When a scene is requested, the loader reads the scene file, processes `$global` directives (root-level merges from referenced files), then recursively resolves `$ref` directives (inline replacements where `{ "$ref": "../objects/name" }` is replaced with that file's contents). The result is a single flat JavaScript object with all references inlined. Circular `$ref` chains are detected and throw an error.
+Scene data lives in [`src/data/scenes/`](./src/data/scenes/default.json.md) as JSON/JSONC files. Each scene is a standalone data context for a flow or variant in the prototype. The [`loader`](./src/storyboard/core/loader.js.md) module resolves `$global` and `$ref` directives to merge reusable objects from `src/data/objects/` into the scene root. At runtime, [`StoryboardProvider`](./src/storyboard/context.jsx.md) loads the active scene (determined by `?scene=` URL param) and provides it to the component tree via [`StoryboardContext`](./src/storyboard/StoryboardContext.js.md). Components access scene data using the [`useSceneData`](./src/storyboard/hooks/useSceneData.js.md) hook with dot-notation paths.
 
-The [`StoryboardProvider`](./src/storyboard/context.jsx.md) (placed at the root layout in [`src/pages/_app.jsx`](./src/pages/_app.jsx.md)) calls `loadScene()` on mount and exposes the result via [`StoryboardContext`](./src/storyboard/StoryboardContext.js.md). Components access data through [`useSceneData(path?)`](./src/storyboard/hooks/useSceneData.js.md), which supports dot-notation paths like `'user.profile.name'` powered by the [`getByPath()`](./src/storyboard/core/dotPath.js.md) utility. The provider blocks rendering until data is loaded, so components can safely destructure without null checks.
+Session state uses URL hash params (`#key=value`) to store transient UI state that shouldn't trigger React Router re-renders. React Router (via `generouted`) patches `history.replaceState/pushState`, so any search param change causes a full route tree re-render. The hash is invisible to the router. The [`session.js`](./src/storyboard/core/session.js.md) module provides low-level utilities (`getParam`, `setParam`, `removeParam`) for reading and writing hash params. The [`useSession`](./src/storyboard/hooks/useSession.js.md) hook wraps these utilities with `useSyncExternalStore` to reactively subscribe to `hashchange` events. Values from hash params override scene defaults, enabling URL-based state that persists across refreshes without mutating scene JSON.
 
-The public API is re-exported through a barrel file at [`src/storyboard/index.js`](./src/storyboard/index.js.md): `StoryboardProvider`, `useSceneData`, `useSceneLoading`, `getByPath`, and `loadScene`. Two debug/demo components — [`SceneDataDemo`](./src/storyboard/components/SceneDataDemo.jsx.md) (uses hooks) and [`SceneDebug`](./src/storyboard/components/SceneDebug.jsx.md) (uses loader directly) — demonstrate both consumption patterns.
+All public exports are re-exported through the barrel file [`src/storyboard/index.js`](./src/storyboard/index.js.md). This separation of scene data (immutable, file-backed) and session state (ephemeral, URL-backed) lets prototypes use JSON for fixture data while keeping transient UI state (filters, selected tabs, etc.) out of the data layer.
 
-- [`src/storyboard/core/loader.js`](./src/storyboard/core/loader.js.md) — Scene loader: resolves `$ref`/`$global` directives, JSONC support, circular ref detection
-- [`src/storyboard/context.jsx`](./src/storyboard/context.jsx.md) — StoryboardProvider: loads scene data, blocks rendering until ready, provides context
-- [`src/storyboard/StoryboardContext.js`](./src/storyboard/StoryboardContext.js.md) — React context object (separated to avoid circular imports)
-- [`src/storyboard/hooks/useSceneData.js`](./src/storyboard/hooks/useSceneData.js.md) — `useSceneData(path?)` and `useSceneLoading()` hooks for consuming scene data
-- [`src/storyboard/core/dotPath.js`](./src/storyboard/core/dotPath.js.md) — `getByPath()` utility for dot-notation object traversal
-- [`src/storyboard/index.js`](./src/storyboard/index.js.md) — Public barrel: re-exports Provider, hooks, loader, and utilities
-- [`src/storyboard/components/SceneDataDemo.jsx`](./src/storyboard/components/SceneDataDemo.jsx.md) — Demo component showcasing `useSceneData()` hook usage
-- [`src/storyboard/components/SceneDebug.jsx`](./src/storyboard/components/SceneDebug.jsx.md) — Debug component: renders resolved scene data as formatted JSON
+- [`src/storyboard/components/SceneDataDemo.jsx`](./src/storyboard/components/SceneDataDemo.jsx.md) — Demo component showcasing `useSession` with URL hash overrides
+- [`src/storyboard/components/SceneDebug.jsx`](./src/storyboard/components/SceneDebug.jsx.md) — Debug component that renders raw resolved scene JSON
+- [`src/storyboard/context.jsx`](./src/storyboard/context.jsx.md) — Provider component that loads scene data and exposes it via React context
+- [`src/storyboard/core/dotPath.js`](./src/storyboard/core/dotPath.js.md) — Utility for reading nested values with dot-notation paths
+- [`src/storyboard/core/loader.js`](./src/storyboard/core/loader.js.md) — Scene loader that resolves `$global` and `$ref` directives
+- [`src/storyboard/core/session.js`](./src/storyboard/core/session.js.md) — Low-level URL hash utilities for session state
+- [`src/storyboard/hooks/useSceneData.js`](./src/storyboard/hooks/useSceneData.js.md) — Hook for accessing read-only scene data
+- [`src/storyboard/hooks/useSession.js`](./src/storyboard/hooks/useSession.js.md) — Hook for read/write session state with hash-based storage
+- [`src/storyboard/index.js`](./src/storyboard/index.js.md) — Public barrel file exporting all storyboard APIs
+- [`src/storyboard/StoryboardContext.js`](./src/storyboard/StoryboardContext.js.md) — React context object shared by provider and hooks
 
 ## Data Files
 
-Scene data is the content layer of the storyboard system. It lives in two directories under `src/data/`: **objects** (`src/data/objects/`) contain reusable data fragments (a user profile, navigation items), while **scenes** (`src/data/scenes/`) compose those objects into complete data contexts for a prototype.
+Scene data files define the fixture data for different prototype flows. Each scene is a complete data context loaded by the storyboard system. Scenes use `$global` arrays to merge shared objects from `src/data/objects/` and `$ref` objects for inline references.
 
-Scenes support two composition directives processed by the [`loader`](./src/storyboard/core/loader.js.md): `$ref` replaces an object with the contents of another file (`{ "$ref": "../objects/jane-doe" }`), and `$global` merges an array of referenced files into the scene root. This separation means shared data (like navigation) is defined once and reused across scenes, while scene-specific data (like project lists or settings) is defined inline.
-
-Switching between scenes is URL-driven — navigating to `?scene=other-scene` causes the [`StoryboardProvider`](./src/storyboard/context.jsx.md) to load [`src/data/scenes/other-scene.json`](./src/data/scenes/other-scene.json.md) instead of the [`default`](./src/data/scenes/default.json.md), swapping all the data that components see. This enables testing the same UI with different users, configurations, or content without changing any component code.
-
-- [`src/data/scenes/default.json`](./src/data/scenes/default.json.md) — Default scene: Jane Doe user, navigation, projects, and settings (uses `$ref` for shared objects)
-- [`src/data/scenes/other-scene.json`](./src/data/scenes/other-scene.json.md) — Alternate scene: John Doe user (inline), same navigation/projects/settings
+- [`src/data/scenes/default.json`](./src/data/scenes/default.json.md) — Default scene loaded when no `?scene=` param is present
+- [`src/data/scenes/other-scene.json`](./src/data/scenes/other-scene.json.md) — Example alternative scene
 
 ## Entry Points
 
-The app mounts at [`src/index.jsx`](./src/index.jsx.md), which sets up the React root with Primer's `ThemeProvider` (auto color mode), global styles (`reset.css`, `globals.css`), and the Generouted `<Routes />` component that loads the file-based route tree from `src/pages/`.
-
-- [`src/index.jsx`](./src/index.jsx.md) — React root: ThemeProvider, BaseStyles, ColorModeSwitcher, and Routes
+- [`src/index.jsx`](./src/index.jsx.md) — Application entry point that mounts React and wraps the app in Primer's `ThemeProvider`
 
 ## Routing
 
-Routing uses Generouted's file-based convention: files in `src/pages/` become routes automatically. The [`_app.jsx`](./src/pages/_app.jsx.md) file is the root layout that wraps all routes in the [`StoryboardProvider`](./src/storyboard/context.jsx.md), making scene data available to every page via React context. This means any page component can call [`useSceneData()`](./src/storyboard/hooks/useSceneData.js.md) without setup.
-
-- [`src/pages/_app.jsx`](./src/pages/_app.jsx.md) — Root layout: wraps all routes in StoryboardProvider + Outlet
+- [`src/pages/_app.jsx`](./src/pages/_app.jsx.md) — Root layout wrapping all routes with `StoryboardProvider`
 
 ## Configuration
 
-The build toolchain is Vite with React and PostCSS. [`vite.config.js`](./vite.config.js.md) configures the Generouted plugin for file-based routing and a PostCSS pipeline that injects Primer Primitives design tokens as global CSS custom media. The project is defined in [`package.json`](./package.json.md) as a private ESM React 19 app.
-
-- [`package.json`](./package.json.md) — Project manifest: scripts (`dev`, `build`, `lint`, `preview`), runtime and dev dependencies
-- [`vite.config.js`](./vite.config.js.md) — Vite config: React plugin, Generouted routing plugin, PostCSS pipeline with Primer Primitives
+- [`package.json`](./package.json.md) — Project dependencies and scripts
+- [`vite.config.js`](./vite.config.js.md) — Vite build config with React, Generouted routing, and Primer CSS pipeline
 
 ## Pages
 
-Page routes are auto-generated from `src/pages/` by Generouted. Each `.jsx` file becomes a route at its corresponding URL path. All pages render inside the [`_app.jsx`](./src/pages/_app.jsx.md) layout and have access to storyboard scene data.
-
-- [`src/pages/index.jsx`](./src/pages/index.jsx.md) — Home page (`/`): renders Playground and ColorModeSwitcher
+- [`src/pages/index.jsx`](./src/pages/index.jsx.md) — Home page route
 
