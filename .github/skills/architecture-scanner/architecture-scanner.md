@@ -23,19 +23,27 @@ Run this first to ensure the file list is current.
 
 ### Step 2: Determine what needs to be done
 
-Run one of these depending on whether this is a **full scan** or an **incremental update**:
+Run `--stale` to get the incremental manifest. This is the **default for all runs** unless architecture docs don't exist yet.
 
-**Full scan** (first time, or when requested explicitly):
-```bash
-.github/skills/architecture-scanner/scan.sh --manifest
-```
-This outputs every non-low file that needs documentation. Use this as the authoritative list — do NOT manually pick files.
-
-**Incremental update** (default for subsequent runs):
 ```bash
 .github/skills/architecture-scanner/scan.sh --stale
 ```
-This outputs only files whose documentation is **missing** or **stale** (source file was modified more recently than its doc). Each entry includes a `"status"` field: `"missing"` or `"stale"`. If the output is an empty array `[]`, all docs are up to date — skip to Step 4.
+
+This uses **git history** to detect changes: it finds the most recent commit that touched `.github/architecture/`, then diffs against `HEAD` to identify which tracked source files have changed since then. It also includes any uncommitted (staged or unstaged) changes. Each entry includes a `"status"` field: `"missing"` (no doc exists) or `"stale"` (source changed since last architecture update).
+
+If the output is an empty array `[]`, all docs are up to date — skip to Step 4.
+
+**When `--stale` suggests a full scan:** If more than 50% of documented files need updates, the output wraps the file list in an object with `"suggestion": "full_scan"` and a message. In this case, switch to a full scan:
+
+```bash
+.github/skills/architecture-scanner/scan.sh --manifest
+```
+
+This outputs every non-low file regardless of change status. Use this for:
+- **First-time runs** (no architecture docs exist yet)
+- **Template changes** (when the doc format itself changed, so all docs need regeneration)
+- **When `--stale` suggests it** (many files changed across multiple commits)
+- **When the user explicitly requests a full scan**
 
 **Low importance files are excluded from both manifests and should NOT get architecture docs.**
 
