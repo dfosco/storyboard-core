@@ -1,13 +1,12 @@
 # Storyboard
 
-A small framework to create stateful prototypes. Storyboard lets you use JSON as a simple database for your prototype, creating **scenes** to prototype flows of your app and saving data to URLs. This means:
+A small framework to create stateful prototypes. Create `scenes` with JSON to prototype flows of your app and save all interaction as URL parameters. This means:
 
-- Create `scenes` to represent different flows in your app
 - Set up interactions that create and edit data in your UI with ease
-- Every single change is saved to a unique URL — share *any* state of your prototype!
+- Every single change is saved to a unique URL — that means you can share *any* state of your prototype
 - Work with data structures that mirror your production app - without the complexity of connecting to APIs or using complex frameworks like NextJS
 
-Built with [Vite](https://vite.dev) and [generouted](https://github.com/oedotme/generouted). Uses [GitHub Primer](https://primer.style) for layout -- more design system support coming soon!
+Built with [Vite](https://vite.dev) and [generouted](https://github.com/oedotme/generouted). Uses [GitHub Primer](https://primer.style) for layout – support for more design systems coming soon!
 
 ## Quick Start
 
