@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Routes } from '@generouted/react-router'
+import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { routes } from '@generouted/react-router'
 import { ThemeProvider, BaseStyles } from '@primer/react'
 import './reset.css'
 import './globals.css'
@@ -11,12 +12,16 @@ import DevTools from './storyboard/components/DevTools/DevTools.jsx'
 const rootElement = document.getElementById('root')
 const root = createRoot(rootElement)
 
+const router = createBrowserRouter(routes, {
+    basename: import.meta.env.BASE_URL,
+})
+
 root.render(
     <StrictMode>
         <ThemeProvider colorMode="auto">
             <BaseStyles>
                 <ColorModeSwitcher />
-                <Routes />
+                <RouterProvider router={router} />
                 {import.meta.env.DEV && <DevTools />}
             </BaseStyles>
         </ThemeProvider>
