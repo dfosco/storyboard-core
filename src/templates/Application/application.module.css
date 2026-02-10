@@ -6,17 +6,22 @@
 
 .navigation {
   width: 320px;
-  padding-inline: var(--base-size-16);
+  padding: var(--base-size-16);
   border-inline-end: 1px solid var(--borderColor-default)
 }
 
 .main {
-  min-width: 100vw;
-  padding: var(--base-size-16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  flex: 1;
+  padding: var(--base-size-16) var(--base-size-32);
 }
 
 .container {
   background-color: var(--bgColor-default);
+  gap: 0;
 }
 
 /* Override to fix a broken hover state on the Sidebar Navigation component */
