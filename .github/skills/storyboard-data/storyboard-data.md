@@ -258,6 +258,23 @@ Before finishing data structuring, verify:
 - [ ] The component uses `useSceneData()` for all externalized data
 - [ ] Data objects use realistic placeholder values
 - [ ] The scene name matches the page name or flow
+- [ ] **Hash params are never dropped** — see "Hash Param Preservation" below
+
+## Hash Param Preservation (CRITICAL)
+
+URL hash params are the foundation of the override system. They carry user-set and session-set values across navigations. **Never write code that drops them.**
+
+### How it works
+
+`installHashPreserver(router)` in `src/index.jsx` patches both `<a>` click interception and `router.navigate()` so that hash params automatically carry forward on every navigation — including programmatic `navigate('/SomePage')` calls.
+
+### Rules
+
+1. **Never manually strip or omit the hash.** The global preserver handles it. Plain `navigate('/Page')` works — the hash carries forward automatically.
+2. **Never bypass the router.** Using `window.location.href = '/Page'` or `window.location.assign()` will drop the hash. Always use React Router's `navigate()` or `<Link>`.
+3. **If a page reads overrides, it must use the hooks.** `useSceneData(path)` automatically merges hash overrides. `useOverride(path)` gives read/write access. Using either ensures the page reflects the current session state.
+4. **If a page writes overrides, downstream pages get them for free.** The Signup→Dashboard flow works because Signup writes via `useOverride`, navigation carries the hash, and Dashboard reads via `useSceneData` — no manual plumbing needed.
+5. **To intentionally clear overrides**, use the `clearValue` from `useOverride` or `removeParam` from `session.js`. Never clear by navigating without the hash.
 
 ## Final Step: Provide the URL
 
