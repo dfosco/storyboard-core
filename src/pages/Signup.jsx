@@ -5,12 +5,15 @@ import {
   Card,
   Checkbox,
   FormControl,
+  Reshaped,
   Select,
   Stepper,
   Text,
   TextField,
   View,
 } from 'reshaped'
+import 'reshaped/themes/reshaped/theme.css'
+import 'reshaped/themes/reshaped/media.css'
 import { useOverride } from '../storyboard'
 
 const steps = ['Account', 'Organization', 'Workspace', 'Review']
@@ -99,6 +102,7 @@ export default function Signup() {
   }
 
   return (
+    <Reshaped defaultTheme="reshaped">
     <View padding={8} maxWidth={90} gap={6} direction="column" attributes={{ style: { margin: '0 auto' } }}>
       <Text variant="title-3" weight="bold">Create your cloud account</Text>
       <Text variant="body-2" color="neutral-faded">
@@ -274,5 +278,6 @@ export default function Signup() {
         </View>
       </Card>
     </View>
+    </Reshaped>
   )
 }

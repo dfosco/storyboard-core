@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { Badge, Button, Card, Text, View } from 'reshaped'
+import { Badge, Button, Card, Reshaped, Text, View } from 'reshaped'
+import 'reshaped/themes/reshaped/theme.css'
+import 'reshaped/themes/reshaped/media.css'
 import { useSceneData } from '../storyboard'
 
 function boolLabel(value) {
@@ -24,6 +26,7 @@ export default function Dashboard() {
   const newsletter = useSceneData('signup.workspace.newsletter')
 
   return (
+    <Reshaped defaultTheme="reshaped">
     <View padding={8} gap={6} direction="column" maxWidth={100} attributes={{ style: { margin: '0 auto' } }}>
       <View direction="row" justify="space-between" align="center">
         <View direction="column" gap={1}>
@@ -64,5 +67,6 @@ export default function Dashboard() {
         </Card>
       </View>
     </View>
+    </Reshaped>
   )
 }
