@@ -1,18 +1,10 @@
 /**
- * Preserve URL hash params across all internal link navigations,
- * and use client-side routing to avoid full page reloads.
- *
- * Intercepts click events on <a> elements at the document level.
- * For same-origin internal links, prevents the default browser navigation
- * and uses the React Router instance to navigate client-side — preserving
- * the current URL hash.
- *
- * This works regardless of the link component used (Primer, React Router,
- * plain <a>, etc.).
+ * Preserve URL hash params across all navigations — both <a> clicks
+ * and programmatic router.navigate() calls.
  *
  * Hash is NOT preserved when:
- * - The link already has its own hash fragment
- * - The link points to an external origin
+ * - The target path already has its own hash fragment
+ * - The link points to an external origin (click handler only)
  * - The current URL has no hash
  *
  * @param {import('react-router-dom').Router} router - React Router instance
@@ -22,6 +14,7 @@ export function installHashPreserver(router, basename = '') {
   // Normalize basename: ensure no trailing slash
   const base = basename.replace(/\/+$/, '')
 
+  // --- 1. Intercept <a> clicks ---
   document.addEventListener('click', (e) => {
     // Skip if modifier keys are held (open in new tab, etc.)
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
@@ -53,4 +46,17 @@ export function installHashPreserver(router, basename = '') {
     e.preventDefault()
     router.navigate(pathname + targetUrl.search + hash)
   })
+
+  // --- 2. Intercept programmatic router.navigate() ---
+  const originalNavigate = router.navigate.bind(router)
+  router.navigate = (to, opts) => {
+    const currentHash = window.location.hash
+    const hasCurrentHash = currentHash && currentHash !== '#'
+
+    if (hasCurrentHash && typeof to === 'string' && !to.includes('#')) {
+      to = to + currentHash
+    }
+
+    return originalNavigate(to, opts)
+  }
 }
