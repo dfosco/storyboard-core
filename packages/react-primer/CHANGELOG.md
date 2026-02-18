@@ -1,5 +1,16 @@
 # @dfosco/storyboard-react-primer
 
+## 1.8.0
+
+### Minor Changes
+
+-   Add Viewfinder component, sceneMeta support (route + author), getSceneMeta utility, Viewfinder as index page, optimizeDeps auto-exclude fix
+
+### Patch Changes
+
+-   Updated dependencies
+    -   @dfosco/storyboard-react@1.8.0
+
 ## 1.7.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @dfosco/storyboard-core
 
+## 1.8.0
+
+### Minor Changes
+
+-   Add Viewfinder component, sceneMeta support (route + author), getSceneMeta utility, Viewfinder as index page, optimizeDeps auto-exclude fix
+
 ## 1.7.1
 
 ## 1.7.0
