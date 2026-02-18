@@ -38,28 +38,7 @@ Add metadata to each package.json (adjust URLs):
 }
 ```
 
-### 2. Fix internal dependency versions
-
-Change `"*"` to `"workspace:*"` so changesets can replace them with real versions at publish time:
-
-```jsonc
-// packages/react/package.json
-"dependencies": {
-  "@dfosco/storyboard-core": "workspace:*"
-}
-
-// packages/react-primer/package.json
-"dependencies": {
-  "@dfosco/storyboard-react": "workspace:*"
-}
-
-// packages/react-reshaped/package.json
-"dependencies": {
-  "@dfosco/storyboard-react": "workspace:*"
-}
-```
-
-### 3. Add missing dependencies
+### 2. Add missing dependencies
 
 `@dfosco/storyboard-react`'s Vite plugin uses `glob` and `jsonc-parser` — add them as real deps:
 
@@ -68,7 +47,7 @@ cd packages/react
 npm install glob jsonc-parser
 ```
 
-### 4. Add peer dependencies
+### 3. Add peer dependencies
 
 ```jsonc
 // packages/react/package.json
@@ -90,19 +69,18 @@ npm install glob jsonc-parser
 }
 ```
 
-### 5. Update changeset config
+### 4. Update changeset config
 
 Edit `.changeset/config.json`:
 
 ```jsonc
 {
   "access": "public",
-  "fixed": [["@dfosco/storyboard-*"]],
-  // remove "privatePackages" entirely
+  "fixed": [["@dfosco/storyboard-*"]]
 }
 ```
 
-### 6. Set up GitHub Actions secret
+### 5. Set up GitHub Actions secret
 
 Add your npm token as a repository secret named `NPM_TOKEN`:
 
@@ -110,7 +88,7 @@ Add your npm token as a repository secret named `NPM_TOKEN`:
 2. Go to repo **Settings → Secrets and variables → Actions**
 3. Add secret `NPM_TOKEN`
 
-### 7. Add the publish workflow
+### 6. Add the publish workflow
 
 Create `.github/workflows/publish.yml`:
 
