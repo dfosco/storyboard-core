@@ -194,11 +194,12 @@ A record file is a **collection** — an array of entries, each with a unique `i
 
 ### Creating a dynamic route page
 
-Use generouted's `[paramName]` bracket convention for the filename:
+The filename convention `[field].jsx` determines which record field the route matches against:
 
-```
-src/pages/posts/[slug].jsx    → /posts/:slug
-```
+- `pages/issues/[id].jsx` → `useRecord('issues')` matches `entry.id`
+- `pages/posts/[permalink].jsx` → `useRecord('posts', 'permalink')` matches `entry.permalink`
+
+The second argument to `useRecord` defaults to `'id'`, so `useRecord('issues')` is equivalent to `useRecord('issues', 'id')`.
 
 In the component, use `useRecord()`:
 
@@ -206,8 +207,8 @@ In the component, use `useRecord()`:
 import { useRecord } from '../../storyboard'
 
 function BlogPost() {
-  // 'posts' = record file name, 'slug' = route param matched against entry.id
-  const post = useRecord('posts', 'slug')
+  // 'posts' = record file name, 'id' = route param matched against entry.id
+  const post = useRecord('posts', 'id')
   // URL /posts/welcome-to-storyboard → entry with id "welcome-to-storyboard"
 
   if (!post) return <p>Post not found</p>
@@ -239,6 +240,23 @@ A page can use both a scene (for page-level data like navigation) and a record (
   {/* useSceneData('record.title') works here */}
 </StoryboardProvider>
 ```
+
+### No `useState` in pages or components
+
+All state management must happen through storyboard hooks. Storyboard state lives in the URL hash — not in React component state.
+
+**Use these hooks instead:**
+
+| Hook | Purpose |
+|------|---------|
+| `useSceneData(path?)` | Read scene data by dot-notation path |
+| `useOverride(path)` | Read/write hash-param overrides on scene data |
+| `useRecord(name, param?)` | Load a single record entry matched by URL param (defaults to `'id'`) |
+| `useRecords(name)` | Load all entries from a record collection |
+| `useRecordOverride(name, entryId, field)` | Read/write hash-param overrides on a record entry field |
+| `useSceneLoading()` | Returns true while scene is loading |
+
+**Why:** Storyboard is a prototyping framework where all data flows through the URL hash. This makes every state change shareable via URL, inspectable in the address bar, and framework-portable. Using `useState` breaks this contract — the state becomes invisible, unshareable, and tied to React.
 
 ## Common Pitfall: Double-Nesting with `$ref`
 
