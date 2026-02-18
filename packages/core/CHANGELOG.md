@@ -1,5 +1,11 @@
 # @dfosco/storyboard-core
 
+## 1.6.0
+
+### Minor Changes
+
+-   Update all references for storyboard-source repo rename (base paths, workflow URLs, package metadata)
+
 ## 1.1.0
 
 ### Minor Changes

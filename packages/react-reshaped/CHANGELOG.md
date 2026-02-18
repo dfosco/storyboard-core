@@ -1,5 +1,16 @@
 # @dfosco/storyboard-react-reshaped
 
+## 1.6.0
+
+### Minor Changes
+
+-   Update all references for storyboard-source repo rename (base paths, workflow URLs, package metadata)
+
+### Patch Changes
+
+-   Updated dependencies
+    -   @dfosco/storyboard-react@1.6.0
+
 ## 1.1.0
 
 ### Minor Changes
