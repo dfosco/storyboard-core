@@ -38,22 +38,28 @@ DISCOVERY_RULES=(
   # Templates (capitalized JSX in templates/)
   "template|low|src/templates/*/[A-Z]*.jsx"
 
-  # Storyboard barrel
-  "storyboard|medium|src/storyboard/index.js"
+  # Storyboard core package
+  "storyboard|high|packages/core/src/index.js"
+  "storyboard|high|packages/core/src/loader.js"
+  "storyboard|high|packages/core/src/*.js"
 
-  # Storyboard context
-  "storyboard|high|src/storyboard/context.jsx"
-  "storyboard|high|src/storyboard/StoryboardContext.js"
+  # Storyboard react package
+  "storyboard|high|packages/react/src/index.js"
+  "storyboard|high|packages/react/src/context.jsx"
+  "storyboard|high|packages/react/src/StoryboardContext.js"
+  "storyboard|high|packages/react/src/hashPreserver.js"
+  "storyboard|high|packages/react/src/hooks/*.js"
+  "storyboard|medium|packages/react/src/context/FormContext.js"
+  "storyboard|high|packages/react/src/vite/data-plugin.js"
 
-  # Storyboard core modules
-  "storyboard|high|src/storyboard/core/loader.js"
-  "storyboard|high|src/storyboard/core/*.js"
+  # Storyboard primer package
+  "storyboard|high|packages/primer/src/index.js"
+  "storyboard|medium|packages/primer/src/[A-Z]*.jsx"
+  "storyboard|high|packages/primer/src/DevTools/DevTools.jsx"
 
-  # Storyboard hooks
-  "storyboard|high|src/storyboard/hooks/*.js"
-
-  # Storyboard components
-  "storyboard|high|src/storyboard/components/[A-Z]*.jsx"
+  # Storyboard reshaped package
+  "storyboard|medium|packages/reshaped/src/index.js"
+  "storyboard|low|packages/reshaped/src/[A-Z]*.jsx"
 
   # Shared components
   "component|low|src/components/[A-Z]*.jsx"
@@ -61,14 +67,6 @@ DISCOVERY_RULES=(
   # Page routes
   "page|low|src/pages/[A-Z]*.jsx"
   "page|medium|src/pages/index.jsx"
-
-  # Data scenes
-  "data|high|src/data/scenes/*.json"
-  "data|high|src/data/scenes/*.jsonc"
-
-  # Data objects
-  "data|low|src/data/objects/*.json"
-  "data|low|src/data/objects/*.jsonc"
 
   # Global styles
   "style|low|src/globals.css"

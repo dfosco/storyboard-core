@@ -265,7 +265,7 @@ Use `useRecord()` for a single entry (matched by URL param) or `useRecords()` fo
 
 ```jsx
 // src/pages/posts/[slug].jsx — detail page
-import { useRecord } from '../../storyboard'
+import { useRecord } from '@storyboard/react'
 
 function BlogPost() {
   const post = useRecord('posts', 'slug')
@@ -276,7 +276,7 @@ function BlogPost() {
 
 ```jsx
 // src/pages/posts/index.jsx — list page
-import { useRecords } from '../../storyboard'
+import { useRecords } from '@storyboard/react'
 
 function BlogIndex() {
   const posts = useRecords('posts')
@@ -291,7 +291,7 @@ function BlogIndex() {
 Use `useRecordOverride()` to override a specific field on a specific entry. The override is stored in the URL hash:
 
 ```jsx
-import { useRecordOverride } from '../../storyboard'
+import { useRecordOverride } from '@storyboard/react'
 
 // Override the title of a specific post
 const [title, setTitle] = useRecordOverride('posts', 'welcome-to-storyboard', 'title')
@@ -336,7 +336,7 @@ This is a convention, not a hard rule — but it's the recommended way to simula
 Use `useSceneData()` to read data from the current scene. Supports dot-notation for nested access.
 
 ```jsx
-import { useSceneData } from '../storyboard'
+import { useSceneData } from '@storyboard/react'
 
 function UserCard() {
   const user = useSceneData('user')
@@ -363,7 +363,7 @@ function UserCard() {
 Use `useOverride()` when you need to **write** an override. Values are stored in the **URL hash** (`#key=value`) so they persist across page refreshes and can be shared by copying the URL.
 
 ```jsx
-import { useOverride } from '../storyboard'
+import { useOverride } from '@storyboard/react'
 
 const [value, setValue, clearValue] = useOverride('path.to.value')
 ```
@@ -387,7 +387,7 @@ If the user hasn't overridden anything, they see the scene default. Once they in
 ### Example: Updating user info with buttons
 
 ```jsx
-import { useOverride } from '../storyboard'
+import { useOverride } from '@storyboard/react'
 import { Button, ButtonGroup } from '@primer/react'
 
 function UserSwitcher() {
@@ -423,7 +423,7 @@ Storyboard provides form components that automatically persist to URL session st
 
 ```jsx
 import { FormControl, Button } from '@primer/react'
-import { StoryboardForm, TextInput, Textarea } from '../storyboard'
+import { StoryboardForm, TextInput, Textarea } from '@storyboard/primer'
 
 function ProfileForm() {
   return (
@@ -453,7 +453,7 @@ Values are buffered locally while typing. On submit, they flush to the URL hash:
 #user.name=Alice&user.profile.bio=Hello%20world
 ```
 
-Available form components: `TextInput`, `Textarea`, `Select`, `Checkbox`. They look and behave identically to Primer React originals — just import from `'../storyboard'` instead of `'@primer/react'`.
+Available form components: `TextInput`, `Textarea`, `Select`, `Checkbox`. They look and behave identically to Primer React originals — just import from `'@storyboard/primer'` instead of `'@primer/react'`. Equivalent Reshaped form components are available from `'@storyboard/reshaped'`.
 
 ---
 
@@ -473,7 +473,7 @@ No parameter defaults to `?scene=default`.
 ### Programmatically
 
 ```jsx
-import { useScene } from '../storyboard'
+import { useScene } from '@storyboard/react'
 import { Button } from '@primer/react'
 
 function ScenePicker() {
@@ -490,7 +490,7 @@ function ScenePicker() {
 }
 ```
 
-`switchScene()` updates the `?scene=` param and clears all hash overrides (since they belonged to the previous scene).
+`switchScene()` updates the `?scene=` param. Hash overrides persist across scene switches.
 
 ---
 
@@ -532,7 +532,7 @@ Hash is **not** preserved when:
 
 ## API Reference
 
-### Hooks
+### Hooks (`@storyboard/react`)
 
 | Hook | Returns | Description |
 |------|---------|-------------|
@@ -543,24 +543,31 @@ Hash is **not** preserved when:
 | `useRecord(name, param)` | `object \| null` | Load a single record entry. `name` = record file name, `param` = route param matched against `id`. |
 | `useRecords(name)` | `Array` | Load all entries from a record collection. |
 | `useRecordOverride(name, entryId, field)` | `[value, setValue, clearValue]` | Read/write hash overrides on a specific record entry field. Builds path as `record.{name}.{entryId}.{field}`. |
+| `useLocalStorage(path)` | `[value, setValue, clearValue]` | Persist overrides in localStorage. Read priority: hash → localStorage → scene data. |
+| `useHideMode()` | `[isHidden, toggle]` | Toggle clean-URL mode. When active, overrides read/write to localStorage shadow keys instead of the URL hash. |
+| `useUndoRedo()` | `{ canUndo, canRedo, undo, redo }` | Undo/redo for override history snapshots. |
 
 ### Components
 
-| Component | Description |
-|-----------|-------------|
-| `<StoryboardProvider>` | Wraps the app. Loads scene from `?scene=` param. Already configured in `src/index.jsx`. |
-| `<DevTools>` | Floating debug panel showing current scene, hash params, and scene data. Already configured in `_app.jsx`. |
-| `<SceneDebug>` | Renders resolved scene data as formatted JSON. Import directly from `storyboard/internals/components/SceneDebug.jsx`. |
-| `<StoryboardForm>` | Form wrapper. `data` prop sets root path for child inputs. Buffers values locally; flushes to URL hash on submit. |
-| `<TextInput>` | Wrapped Primer TextInput. `name` prop auto-binds to session state via form context. |
-| `<Textarea>` | Wrapped Primer Textarea. `name` prop auto-binds to session state via form context. |
-| `<Select>` | Wrapped Primer Select. `name` prop auto-binds to session state via form context. |
-| `<Checkbox>` | Wrapped Primer Checkbox. `name` prop auto-binds to session state via form context. |
+| Component | Package | Description |
+|-----------|---------|-------------|
+| `<StoryboardProvider>` | `@storyboard/react` | Wraps the app. Loads scene from `?scene=` param. Already configured in `src/pages/_app.jsx`. |
+| `<DevTools>` | `@storyboard/primer` | Floating debug panel showing current scene, hash params, and scene data. Already configured in `src/index.jsx`. |
+| `<SceneDebug>` | `@storyboard/primer` | Renders resolved scene data as formatted JSON. |
+| `<SceneDataDemo>` | `@storyboard/primer` | Interactive demo of scene data and overrides. |
+| `<StoryboardForm>` | `@storyboard/primer` | Form wrapper. `data` prop sets root path for child inputs. Buffers values locally; flushes to URL hash on submit. |
+| `<TextInput>` | `@storyboard/primer` | Wrapped Primer TextInput. `name` prop auto-binds to session state via form context. |
+| `<Textarea>` | `@storyboard/primer` | Wrapped Primer Textarea. `name` prop auto-binds to session state via form context. |
+| `<Select>` | `@storyboard/primer` | Wrapped Primer Select. `name` prop auto-binds to session state via form context. |
+| `<Checkbox>` | `@storyboard/primer` | Wrapped Primer Checkbox. `name` prop auto-binds to session state via form context. |
 
-### Utilities
+> **Reshaped equivalents:** `StoryboardForm`, `TextInput`, `Textarea`, `Select`, and `Checkbox` are also available from `@storyboard/reshaped` with the same API but Reshaped styling.
+
+### Utilities (`@storyboard/core`)
 
 | Function | Description |
 |----------|-------------|
+| `init({ scenes, objects, records })` | Seed the data index. Called automatically by the Vite plugin. |
 | `loadScene(name)` | Low-level scene loader. Returns resolved scene data. |
 | `loadRecord(name)` | Low-level record loader. Returns full array. |
 | `findRecord(name, id)` | Find a single entry in a record collection by id. |
@@ -573,8 +580,18 @@ Hash is **not** preserved when:
 | `setParam(key, value)` | Write a URL hash param. |
 | `getAllParams()` | Get all hash params as an object. |
 | `removeParam(key)` | Remove a URL hash param. |
-| `installHashPreserver(router, basename)` | Intercepts both `<a>` link clicks and programmatic `router.navigate()` calls for client-side navigation with hash preservation. |
+| `subscribeToHash(callback)` | Subscribe to hash changes (for reactive frameworks). |
 | `getHashSnapshot()` | Returns current hash string (for `useSyncExternalStore`). |
+| `getLocal(key)` / `setLocal(key, value)` / `removeLocal(key)` | localStorage read/write/remove for persistent overrides. |
+| `isHideMode()` / `activateHideMode()` / `deactivateHideMode()` | Toggle clean-URL mode (overrides move from hash to localStorage). |
+| `installHideParamListener()` | Listens for `?hide` / `?show` URL params to toggle hide mode. |
+| `installHistorySync()` | Syncs hash changes to the undo/redo history stack. |
+
+### Utilities (`@storyboard/react`)
+
+| Function | Description |
+|----------|-------------|
+| `installHashPreserver(router, basename)` | Intercepts both `<a>` link clicks and programmatic `router.navigate()` calls for client-side navigation with hash preservation. |
 
 ### Special JSON keys
 
@@ -598,19 +615,26 @@ npm run lint     # ESLint
 
 Detailed architecture docs live in `.github/architecture/`. Implementation plan and phase history in `.github/plans/`.
 
-### Core / React Split
+### Package Structure
 
-The storyboard system is split into framework-agnostic and framework-specific layers:
+The storyboard system is organized as an npm workspace with four packages:
 
 ```
-storyboard/
-├── core/     ← Framework-agnostic (pure JS, zero dependencies)
-├── vite/     ← Vite data plugin (works with any Vite frontend)
-├── internals/ ← Framework-specific plumbing (React hooks, context, Primer components)
-└── index.js  ← Barrel re-exporting from core + react
+packages/
+├── core/      ← @storyboard/core — Framework-agnostic (pure JS, zero dependencies)
+├── react/     ← @storyboard/react — React hooks, context, provider (design-system agnostic)
+├── primer/    ← @storyboard/primer — Primer React form components, DevTools
+└── reshaped/  ← @storyboard/reshaped — Reshaped form components
 ```
 
-**For non-React frontends** (Alpine.js, Vue, Svelte, vanilla JS), import only from `core/`:
+| Package | Purpose | Import |
+|---------|---------|--------|
+| `@storyboard/core` | Data loading, URL hash state, dot-path utilities, localStorage, hide mode | `import { loadScene, getParam } from '@storyboard/core'` |
+| `@storyboard/react` | Provider, hooks (`useSceneData`, `useOverride`, `useRecord`, etc.), hash preserver | `import { useSceneData } from '@storyboard/react'` |
+| `@storyboard/primer` | Primer-styled form inputs, DevTools, SceneDebug | `import { TextInput, DevTools } from '@storyboard/primer'` |
+| `@storyboard/reshaped` | Reshaped-styled form inputs (same API as Primer) | `import { TextInput } from '@storyboard/reshaped'` |
+
+**For non-React frontends** (Alpine.js, Vue, Svelte, vanilla JS), import only from `@storyboard/core`:
 
 ```js
 import {
@@ -618,7 +642,7 @@ import {
   getByPath, setByPath, deepClone,
   getParam, setParam, getAllParams, removeParam,
   subscribeToHash, getHashSnapshot,
-} from './storyboard/core/index.js'
+} from '@storyboard/core'
 
 // 1. Seed the data index (the Vite plugin does this automatically)
 init({ scenes: { ... }, objects: { ... }, records: { ... } })

@@ -6,7 +6,7 @@ import {
   Checkbox,
   Select,
   Textarea,
-} from '@storyboard/primer'
+} from '@storyboard/react-primer'
 import { useOverride } from '@storyboard/react'
 import {
   HomeIcon,

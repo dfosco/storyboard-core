@@ -7,7 +7,7 @@ import './reset.css'
 import './globals.css'
 
 import ColorModeSwitcher from './components/ColorModeSwitcher'
-import { DevTools } from '@storyboard/primer'
+import { DevTools } from '@storyboard/react-primer'
 import { installHashPreserver } from '@storyboard/react/hash-preserver'
 import { installHideParamListener, installHistorySync } from '@storyboard/core'
 
