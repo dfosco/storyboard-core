@@ -1,6 +1,6 @@
 {
   "name": "@dfosco/storyboard-react",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -12,7 +12,9 @@
     "url": "https://github.com/dfosco/storyboard-react.git",
     "directory": "packages/core"
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "peerDependencies": {
     "react": ">=18",
     "react-router-dom": ">=6",

@@ -1,6 +1,6 @@
 {
   "name": "@dfosco/storyboard-core",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -9,7 +9,9 @@
     "url": "https://github.com/dfosco/storyboard.git",
     "directory": "packages/core"
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "exports": {
     ".": "./src/index.js",
     "./comments": "./src/comments/index.js"
