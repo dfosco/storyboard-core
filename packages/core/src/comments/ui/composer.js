@@ -132,36 +132,6 @@ function injectStyles() {
       background: rgba(255,255,255,0.06);
       font-family: inherit;
     }
-
-    .sb-comment-pin {
-      position: absolute;
-      z-index: 100000;
-      width: 28px;
-      height: 28px;
-      margin-left: -14px;
-      margin-top: -14px;
-      border-radius: 50%;
-      background: #238636;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-      pointer-events: auto;
-      transition: transform 100ms ease;
-    }
-    .sb-comment-pin:hover {
-      transform: scale(1.15);
-    }
-    .sb-comment-pin[data-resolved="true"] {
-      background: #8b949e;
-      opacity: 0.5;
-    }
   `
   document.head.appendChild(style)
 }
