@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useContext, useState, useEffect } from 'react'
 import { Checkbox as ReshapedCheckbox } from 'reshaped'
-import { FormContext, useOverride } from '@storyboard/react'
+import { FormContext, useOverride } from '@dfosco/storyboard-react'
 
 /**
  * Wrapped Reshaped Checkbox that integrates with StoryboardForm.

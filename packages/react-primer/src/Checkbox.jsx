@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 import { useContext, useState, useEffect } from 'react'
 import { Checkbox as PrimerCheckbox } from '@primer/react'
-import { FormContext } from '@storyboard/react'
-import { useOverride } from '@storyboard/react'
+import { FormContext } from '@dfosco/storyboard-react'
+import { useOverride } from '@dfosco/storyboard-react'
 
 /**
  * Wrapped Primer Checkbox that integrates with StoryboardForm.

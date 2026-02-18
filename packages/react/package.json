@@ -1,10 +1,10 @@
 {
-  "name": "@storyboard/react",
+  "name": "@dfosco/storyboard-react",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@storyboard/core": "*"
+    "@dfosco/storyboard-core": "*"
   },
   "peerDependencies": {
     "react": ">=18",

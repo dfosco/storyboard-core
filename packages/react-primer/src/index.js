@@ -1,5 +1,5 @@
 /**
- * @storyboard/primer — Primer React design system package for Storyboard.
+ * @dfosco/storyboard-react-primer — Primer React design system package for Storyboard.
  *
  * Provides storyboard-aware form components backed by Primer React,
  * plus dev tools styled with Primer.

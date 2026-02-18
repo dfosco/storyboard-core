@@ -6,8 +6,8 @@ import {
   Checkbox,
   Select,
   Textarea,
-} from '@storyboard/react-primer'
-import { useOverride } from '@storyboard/react'
+} from '@dfosco/storyboard-react-primer'
+import { useOverride } from '@dfosco/storyboard-react'
 import {
   HomeIcon,
   GearIcon,

@@ -12,8 +12,8 @@ import {
 } from 'reshaped'
 import 'reshaped/themes/reshaped/theme.css'
 import 'reshaped/themes/reshaped/media.css'
-import { useSceneData, useOverride, useRecord, useRecordOverride } from '@storyboard/react'
-import { setParam, removeParam } from '@storyboard/core'
+import { useSceneData, useOverride, useRecord, useRecordOverride } from '@dfosco/storyboard-react'
+import { setParam, removeParam } from '@dfosco/storyboard-core'
 import AppSidebar from '../../components/AppSidebar/AppSidebar.jsx'
 import IssueFormFields, { statusLabels, priorityLabels } from '../../components/IssueFormFields/IssueFormFields.jsx'
 

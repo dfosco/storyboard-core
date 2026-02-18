@@ -1,10 +1,10 @@
 {
-  "name": "@storyboard/react-reshaped",
+  "name": "@dfosco/storyboard-react-reshaped",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@storyboard/react": "*",
+    "@dfosco/storyboard-react": "*",
     "reshaped": "^3.9.0"
   },
   "exports": {

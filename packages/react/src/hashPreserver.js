@@ -1,4 +1,4 @@
-import { interceptHideParams } from '@storyboard/core'
+import { interceptHideParams } from '@dfosco/storyboard-core'
 
 /**
  * Preserve URL hash params across all navigations — both <a> clicks

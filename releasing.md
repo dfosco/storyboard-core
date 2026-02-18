@@ -1,27 +1,19 @@
-# Releasing @storyboard packages
+# Releasing @dfosco/storyboard-* packages
 
 All four packages share a **fixed version** — every release bumps them together.
 
 | Package | Description |
 |---------|-------------|
-| `@storyboard/core` | Framework-agnostic data layer, DevTools, utilities |
-| `@storyboard/react` | React hooks, context, Vite plugin |
-| `@storyboard/react-primer` | Primer design system form wrappers |
-| `@storyboard/react-reshaped` | Reshaped design system form wrappers |
+| `@dfosco/storyboard-core` | Framework-agnostic data layer, DevTools, utilities |
+| `@dfosco/storyboard-react` | React hooks, context, Vite plugin |
+| `@dfosco/storyboard-react-primer` | Primer design system form wrappers |
+| `@dfosco/storyboard-react-reshaped` | Reshaped design system form wrappers |
 
 ---
 
 ## One-time setup
 
-### 1. Claim npm org
-
-```bash
-npm login
-npm org create storyboard     # or claim via npmjs.com
-npm org add storyboard <user>  # add yourself as admin
-```
-
-### 2. Make packages public
+### 1. Make packages public
 
 Remove `"private": true` from each package.json:
 
@@ -46,37 +38,37 @@ Add metadata to each package.json (adjust URLs):
 }
 ```
 
-### 3. Fix internal dependency versions
+### 2. Fix internal dependency versions
 
 Change `"*"` to `"workspace:*"` so changesets can replace them with real versions at publish time:
 
 ```jsonc
 // packages/react/package.json
 "dependencies": {
-  "@storyboard/core": "workspace:*"
+  "@dfosco/storyboard-core": "workspace:*"
 }
 
 // packages/react-primer/package.json
 "dependencies": {
-  "@storyboard/react": "workspace:*"
+  "@dfosco/storyboard-react": "workspace:*"
 }
 
 // packages/react-reshaped/package.json
 "dependencies": {
-  "@storyboard/react": "workspace:*"
+  "@dfosco/storyboard-react": "workspace:*"
 }
 ```
 
-### 4. Add missing dependencies
+### 3. Add missing dependencies
 
-`@storyboard/react`'s Vite plugin uses `glob` and `jsonc-parser` — add them as real deps:
+`@dfosco/storyboard-react`'s Vite plugin uses `glob` and `jsonc-parser` — add them as real deps:
 
 ```bash
 cd packages/react
 npm install glob jsonc-parser
 ```
 
-### 5. Add peer dependencies
+### 4. Add peer dependencies
 
 ```jsonc
 // packages/react/package.json
@@ -98,19 +90,19 @@ npm install glob jsonc-parser
 }
 ```
 
-### 6. Update changeset config
+### 5. Update changeset config
 
 Edit `.changeset/config.json`:
 
 ```jsonc
 {
   "access": "public",
-  "fixed": [["@storyboard/*"]],
+  "fixed": [["@dfosco/storyboard-*"]],
   // remove "privatePackages" entirely
 }
 ```
 
-### 7. Set up GitHub Actions secret
+### 6. Set up GitHub Actions secret
 
 Add your npm token as a repository secret named `NPM_TOKEN`:
 
@@ -118,7 +110,7 @@ Add your npm token as a repository secret named `NPM_TOKEN`:
 2. Go to repo **Settings → Secrets and variables → Actions**
 3. Add secret `NPM_TOKEN`
 
-### 8. Add the publish workflow
+### 7. Add the publish workflow
 
 Create `.github/workflows/publish.yml`:
 
@@ -218,13 +210,13 @@ git push --follow-tags
 ### Minimal (React + Primer)
 
 ```bash
-npm install @storyboard/core @storyboard/react @storyboard/react-primer
+npm install @dfosco/storyboard-core @dfosco/storyboard-react @dfosco/storyboard-react-primer
 ```
 
 ### With Reshaped instead
 
 ```bash
-npm install @storyboard/core @storyboard/react @storyboard/react-reshaped
+npm install @dfosco/storyboard-core @dfosco/storyboard-react @dfosco/storyboard-react-reshaped
 ```
 
 ### Vite config
@@ -233,7 +225,7 @@ npm install @storyboard/core @storyboard/react @storyboard/react-reshaped
 // vite.config.js
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { storyboardData } from '@storyboard/react/vite'
+import { storyboardData } from '@dfosco/storyboard-react/vite'
 
 export default defineConfig({
   plugins: [react(), storyboardData()],
@@ -243,8 +235,8 @@ export default defineConfig({
 ### App entry
 
 ```jsx
-import { StoryboardProvider, useSceneData } from '@storyboard/react'
-import { mountDevTools } from '@storyboard/core'
+import { StoryboardProvider, useSceneData } from '@dfosco/storyboard-react'
+import { mountDevTools } from '@dfosco/storyboard-core'
 
 // Mount devtools in dev mode
 if (import.meta.env.DEV) mountDevTools()

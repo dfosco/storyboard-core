@@ -14,7 +14,7 @@ import {
 } from 'reshaped'
 import 'reshaped/themes/reshaped/theme.css'
 import 'reshaped/themes/reshaped/media.css'
-import { useOverride } from '@storyboard/react'
+import { useOverride } from '@dfosco/storyboard-react'
 
 const steps = ['Account', 'Organization', 'Workspace', 'Review']
 
