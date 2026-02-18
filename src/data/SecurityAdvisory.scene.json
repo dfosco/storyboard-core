@@ -1,4 +1,11 @@
 {
-  "$global": ["security-advisory-navigation"],
-  "advisory": { "$ref": "security-advisory" }
+  "sceneMeta": {
+    "author": "dfosco"
+  },
+  "$global": [
+    "security-advisory-navigation"
+  ],
+  "advisory": {
+    "$ref": "security-advisory"
+  }
 }
