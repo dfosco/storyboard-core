@@ -112,10 +112,30 @@ export function showComposer(container, xPct, yPct, route, callbacks = {}) {
   // Initialize Alpine on the new DOM
   window.Alpine.initTree(composer)
 
-  // Focus textarea
+  // Focus textarea and adjust position to stay within viewport
   requestAnimationFrame(() => {
     const textarea = composer.querySelector('textarea')
     if (textarea) textarea.focus()
+
+    const rect = composer.getBoundingClientRect()
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const pad = 8
+    let tx = 12
+    let ty = -(rect.height / 2)
+
+    if (rect.left + rect.width > vw - pad) {
+      tx = -(rect.width + 12)
+    }
+    const anchorY = rect.top + rect.height / 2
+    const finalBottom = anchorY + ty + rect.height
+    if (finalBottom > vh - pad) {
+      ty -= (finalBottom - vh + pad)
+    }
+    if (anchorY + ty < pad) {
+      ty = pad - anchorY
+    }
+    composer.style.transform = `translate(${tx}px, ${ty}px)`
   })
 
   return { el: composer, destroy }

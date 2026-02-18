@@ -7,6 +7,7 @@
  */
 
 import { listDiscussions, fetchRouteDiscussion } from '../api.js'
+import { getCommentsConfig } from '../config.js'
 import { parseMetadata } from '../metadata.js'
 import { isAuthenticated } from '../auth.js'
 import { setCommentMode } from '../commentMode.js'
@@ -97,10 +98,14 @@ export async function openCommentsDrawer() {
     }
 
     // For each discussion, fetch full comments
+    const basePath = getCommentsConfig()?.basePath ?? '/'
     for (const disc of discussions) {
       const routeMatch = disc.title?.match(/^Comments:\s*(.+)$/)
       if (!routeMatch) continue
       const route = routeMatch[1]
+
+      // Skip comments from other branches/deployments
+      if (!route.startsWith(basePath)) continue
 
       let discussion
       try {
@@ -119,17 +124,20 @@ export async function openCommentsDrawer() {
       group.appendChild(routeHeader)
 
       for (const comment of discussion.comments) {
+        const isResolved = !!comment.meta?.resolved
         const btn = document.createElement('button')
         btn.className = 'flex ph4 pv2 pointer bn bg-transparent w-100 tl sans-serif'
-        btn.style.cssText = 'font:inherit;transition:background 100ms'
+        btn.style.cssText = `font:inherit;transition:background 100ms${isResolved ? ';opacity:0.6' : ''}`
 
         const avatar = comment.author?.avatarUrl
           ? `<img class="br-100 ba sb-b-default flex-shrink-0 mr2" style="width:24px;height:24px" src="${comment.author.avatarUrl}" alt="${comment.author?.login ?? ''}" />`
           : ''
 
-        const resolvedBadge = comment.meta?.resolved
+        const resolvedBadge = isResolved
           ? '<span class="sb-fg-success br-pill ph1" style="font-size:10px;background:color-mix(in srgb, var(--sb-fg-success) 10%, transparent)">Resolved</span>'
           : ''
+
+        const textColorClass = isResolved ? 'sb-fg-muted' : 'sb-fg'
 
         const replyCount = comment.replies?.length ?? 0
         const repliesText = replyCount > 0
@@ -140,11 +148,11 @@ export async function openCommentsDrawer() {
           ${avatar}
           <div class="flex-auto" style="min-width:0">
             <div class="flex items-center mb1">
-              <span class="f7 fw6 sb-fg mr1">${comment.author?.login ?? 'unknown'}</span>
+              <span class="f7 fw6 ${isResolved ? 'sb-fg-muted' : 'sb-fg'} mr1">${comment.author?.login ?? 'unknown'}</span>
               ${comment.createdAt ? `<span class="sb-fg-muted mr1" style="font-size:11px">${timeAgo(comment.createdAt)}</span>` : ''}
               ${resolvedBadge}
             </div>
-            <p class="sb-fg ma0 overflow-hidden nowrap truncate lh-copy" style="font-size:13px;text-overflow:ellipsis">${comment.text?.slice(0, 100) ?? ''}</p>
+            <p class="${textColorClass} ma0 overflow-hidden nowrap truncate lh-copy" style="font-size:13px;text-overflow:ellipsis">${comment.text?.slice(0, 100) ?? ''}</p>
             ${repliesText}
           </div>
         `

@@ -6,7 +6,7 @@
  * Styled with Tachyons + sb-* custom classes for light/dark mode support.
  */
 
-import { replyToComment, addReaction, removeReaction, moveComment, resolveComment, fetchRouteDiscussion } from '../api.js'
+import { replyToComment, addReaction, removeReaction, moveComment, resolveComment, unresolveComment, editComment, editReply, deleteComment, fetchRouteDiscussion } from '../api.js'
 import { getCachedUser } from '../auth.js'
 
 const REACTION_EMOJI = {
@@ -225,31 +225,39 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
   const ACTION_BTN_DEFAULT = `${ACTION_BTN} sb-fg-muted`
   const ACTION_BTN_SUCCESS = `${ACTION_BTN} sb-fg-success`
 
-  // Resolve button
+  // Resolve/Unresolve button
   const resolveBtn = document.createElement('button')
   resolveBtn.className = comment.meta?.resolved ? ACTION_BTN_SUCCESS : ACTION_BTN_DEFAULT
   resolveBtn.style.cssText = ACTION_BTN_STYLE
-  resolveBtn.setAttribute('aria-label', comment.meta?.resolved ? 'Resolved' : 'Resolve')
-  resolveBtn.title = comment.meta?.resolved ? 'Resolved' : 'Resolve'
-  resolveBtn.textContent = comment.meta?.resolved ? 'Resolved' : 'Resolve'
-  if (comment.meta?.resolved) resolveBtn.dataset.resolved = 'true'
+  resolveBtn.setAttribute('aria-label', comment.meta?.resolved ? 'Unresolve' : 'Resolve')
+  resolveBtn.title = comment.meta?.resolved ? 'Unresolve' : 'Resolve'
+  resolveBtn.textContent = comment.meta?.resolved ? 'Resolved ✓' : 'Resolve'
   resolveBtn.addEventListener('click', async (e) => {
     e.stopPropagation()
-    if (comment.meta?.resolved) return
-    resolveBtn.dataset.resolved = 'true'
-    resolveBtn.className = ACTION_BTN_SUCCESS
-    resolveBtn.textContent = 'Resolved'
-    resolveBtn.title = 'Resolved'
+    const wasResolved = !!comment.meta?.resolved
+    resolveBtn.disabled = true
+    resolveBtn.textContent = wasResolved ? 'Unresolving…' : 'Resolving…'
     try {
-      await resolveComment(comment.id, comment._rawBody ?? comment.body ?? '')
-      comment.meta = { ...comment.meta, resolved: true }
-      callbacks.onMove?.()
+      if (wasResolved) {
+        await unresolveComment(comment.id, comment._rawBody ?? comment.body ?? '')
+        comment.meta = { ...comment.meta, resolved: false }
+        delete comment.meta.resolved
+        resolveBtn.className = ACTION_BTN_DEFAULT
+        resolveBtn.textContent = 'Resolve'
+        resolveBtn.title = 'Resolve'
+        resolveBtn.disabled = false
+        callbacks.onMove?.()
+      } else {
+        await resolveComment(comment.id, comment._rawBody ?? comment.body ?? '')
+        comment.meta = { ...comment.meta, resolved: true }
+        callbacks.onMove?.()
+        destroy()
+      }
     } catch (err) {
-      console.error('[storyboard] Failed to resolve comment:', err)
-      resolveBtn.dataset.resolved = 'false'
-      resolveBtn.className = ACTION_BTN_DEFAULT
-      resolveBtn.textContent = 'Resolve'
-      resolveBtn.title = 'Resolve'
+      console.error('[storyboard] Failed to toggle resolve:', err)
+      resolveBtn.className = wasResolved ? ACTION_BTN_SUCCESS : ACTION_BTN_DEFAULT
+      resolveBtn.textContent = wasResolved ? 'Resolved ✓' : 'Resolve'
+      resolveBtn.disabled = false
     }
   })
   headerActions.appendChild(resolveBtn)
@@ -312,6 +320,69 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
   textP.textContent = comment.text ?? ''
   body.appendChild(textP)
 
+  // Edit button for top-level comment (only for author)
+  if (user && comment.author?.login === user.login) {
+    const editBtn = document.createElement('button')
+    editBtn.className = 'sb-fg-muted bg-transparent bn pointer f7 mb2 underline-hover'
+    editBtn.textContent = 'Edit'
+    editBtn.addEventListener('click', (e) => {
+      e.stopPropagation()
+      editBtn.style.display = 'none'
+      textP.style.display = 'none'
+
+      const editArea = document.createElement('textarea')
+      editArea.className = 'sb-input w-100 ph2 pv1 br2 f7 sans-serif lh-copy db mb1'
+      editArea.style.cssText = 'min-height:60px;max-height:160px;resize:vertical;box-sizing:border-box'
+      editArea.value = comment.text ?? ''
+      body.insertBefore(editArea, textP.nextSibling)
+
+      const editActions = document.createElement('div')
+      editActions.className = 'flex justify-end mb2'
+      const cancelEdit = document.createElement('button')
+      cancelEdit.className = 'sb-btn-cancel ph2 pv1 br2 f7 fw5 sans-serif pointer mr1'
+      cancelEdit.textContent = 'Cancel'
+      const saveEdit = document.createElement('button')
+      saveEdit.className = 'sb-btn-success ph2 pv1 br2 f7 fw5 sans-serif pointer bn'
+      saveEdit.textContent = 'Save'
+      editActions.appendChild(cancelEdit)
+      editActions.appendChild(saveEdit)
+      body.insertBefore(editActions, editArea.nextSibling)
+
+      cancelEdit.addEventListener('click', (ev) => {
+        ev.stopPropagation()
+        editArea.remove()
+        editActions.remove()
+        textP.style.display = ''
+        editBtn.style.display = ''
+      })
+
+      saveEdit.addEventListener('click', async (ev) => {
+        ev.stopPropagation()
+        const newText = editArea.value.trim()
+        if (!newText) return
+        saveEdit.disabled = true
+        saveEdit.textContent = 'Saving…'
+        try {
+          await editComment(comment.id, comment._rawBody ?? comment.body ?? '', newText)
+          comment.text = newText
+          comment._rawBody = null
+          textP.textContent = newText
+          editArea.remove()
+          editActions.remove()
+          textP.style.display = ''
+          editBtn.style.display = ''
+        } catch (err) {
+          console.error('[storyboard] Failed to edit comment:', err)
+          saveEdit.disabled = false
+          saveEdit.textContent = 'Save'
+        }
+      })
+
+      editArea.focus()
+    })
+    body.appendChild(editBtn)
+  }
+
   // Reactions for the main comment
   body.appendChild(buildReactionBar(comment))
 
@@ -367,6 +438,100 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
       replyText.style.fontSize = '13px'
       replyText.textContent = reply.text ?? reply.body ?? ''
       content.appendChild(replyText)
+
+      // Edit/Delete buttons for reply (only for author)
+      if (user && reply.author?.login === user.login) {
+        const replyActions = document.createElement('div')
+        replyActions.className = 'flex mt1'
+        replyActions.style.gap = '8px'
+
+        const editReplyBtn = document.createElement('button')
+        editReplyBtn.className = 'sb-fg-muted bg-transparent bn pointer underline-hover'
+        editReplyBtn.style.fontSize = '11px'
+        editReplyBtn.textContent = 'Edit'
+        editReplyBtn.addEventListener('click', (ev) => {
+          ev.stopPropagation()
+          editReplyBtn.style.display = 'none'
+          replyText.style.display = 'none'
+          if (replyActions.querySelector('.sb-delete-reply')) replyActions.querySelector('.sb-delete-reply').style.display = 'none'
+
+          const editArea = document.createElement('textarea')
+          editArea.className = 'sb-input w-100 ph2 pv1 br2 sans-serif lh-copy db mb1'
+          editArea.style.cssText = 'min-height:40px;max-height:100px;resize:vertical;box-sizing:border-box;font-size:12px'
+          editArea.value = reply.text ?? reply.body ?? ''
+          content.insertBefore(editArea, replyText.nextSibling)
+
+          const editBtns = document.createElement('div')
+          editBtns.className = 'flex justify-end mb1'
+          const cancelBtn = document.createElement('button')
+          cancelBtn.className = 'sb-btn-cancel ph2 pv1 br2 f7 fw5 sans-serif pointer mr1'
+          cancelBtn.textContent = 'Cancel'
+          const saveBtn = document.createElement('button')
+          saveBtn.className = 'sb-btn-success ph2 pv1 br2 f7 fw5 sans-serif pointer bn'
+          saveBtn.textContent = 'Save'
+          editBtns.appendChild(cancelBtn)
+          editBtns.appendChild(saveBtn)
+          content.insertBefore(editBtns, editArea.nextSibling)
+
+          cancelBtn.addEventListener('click', (ev2) => {
+            ev2.stopPropagation()
+            editArea.remove()
+            editBtns.remove()
+            replyText.style.display = ''
+            editReplyBtn.style.display = ''
+            if (replyActions.querySelector('.sb-delete-reply')) replyActions.querySelector('.sb-delete-reply').style.display = ''
+          })
+
+          saveBtn.addEventListener('click', async (ev2) => {
+            ev2.stopPropagation()
+            const newText = editArea.value.trim()
+            if (!newText) return
+            saveBtn.disabled = true
+            saveBtn.textContent = 'Saving…'
+            try {
+              await editReply(reply.id, newText)
+              reply.text = newText
+              reply.body = newText
+              replyText.textContent = newText
+              editArea.remove()
+              editBtns.remove()
+              replyText.style.display = ''
+              editReplyBtn.style.display = ''
+              if (replyActions.querySelector('.sb-delete-reply')) replyActions.querySelector('.sb-delete-reply').style.display = ''
+            } catch (err) {
+              console.error('[storyboard] Failed to edit reply:', err)
+              saveBtn.disabled = false
+              saveBtn.textContent = 'Save'
+            }
+          })
+
+          editArea.focus()
+        })
+        replyActions.appendChild(editReplyBtn)
+
+        const deleteReplyBtn = document.createElement('button')
+        deleteReplyBtn.className = 'sb-delete-reply sb-fg-danger bg-transparent bn pointer underline-hover'
+        deleteReplyBtn.style.fontSize = '11px'
+        deleteReplyBtn.textContent = 'Delete'
+        deleteReplyBtn.addEventListener('click', async (ev) => {
+          ev.stopPropagation()
+          if (!confirm('Delete this reply?')) return
+          deleteReplyBtn.textContent = 'Deleting…'
+          deleteReplyBtn.disabled = true
+          try {
+            await deleteComment(reply.id)
+            replyEl.remove()
+            callbacks.onMove?.()
+          } catch (err) {
+            console.error('[storyboard] Failed to delete reply:', err)
+            deleteReplyBtn.textContent = 'Delete'
+            deleteReplyBtn.disabled = false
+          }
+        })
+        replyActions.appendChild(deleteReplyBtn)
+
+        content.appendChild(replyActions)
+      }
 
       // Reply reactions
       content.appendChild(buildReactionBar(reply))
@@ -524,6 +689,37 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
   window.history.replaceState(null, '', url.toString())
 
   container.appendChild(win)
+
+  // Adjust position to keep window within viewport
+  requestAnimationFrame(() => {
+    const rect = win.getBoundingClientRect()
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const pad = 8
+
+    let tx = 12
+    let ty = -(rect.height / 2)
+
+    // Flip left if it would overflow right edge
+    const rightEdge = rect.left + rect.width
+    if (rightEdge > vw - pad) {
+      tx = -(rect.width + 12)
+    }
+
+    // Clamp vertically: compute final top/bottom in viewport coords
+    const anchorY = rect.top + rect.height / 2 // center of the initial rect (transform was 12px, -50%)
+    const finalTop = anchorY + ty
+    const finalBottom = finalTop + rect.height
+
+    if (finalBottom > vh - pad) {
+      ty -= (finalBottom - vh + pad)
+    }
+    if (anchorY + ty < pad) {
+      ty = pad - anchorY
+    }
+
+    win.style.transform = `translate(${tx}px, ${ty}px)`
+  })
 
   function destroy() {
     document.removeEventListener('mousemove', onMouseMove)

@@ -123,14 +123,58 @@ export async function replyToComment(discussionId, commentId, text) {
 }
 
 /**
- * Resolve a comment by updating its metadata.
+ * Resolve a comment by updating its metadata and prepending "(Resolved)" to the text.
  * @param {string} commentId - The comment ID
  * @param {string} currentBody - The current comment body
  * @returns {Promise<object>}
  */
 export async function resolveComment(commentId, currentBody) {
-  const newBody = updateMetadata(currentBody, { resolved: true })
+  const { meta, text } = parseMetadata(currentBody)
+  const newMeta = { ...meta, resolved: true }
+  const resolvedText = text.startsWith('(Resolved) ') ? text : `(Resolved) ${text}`
+  const newBody = serializeMetadata(newMeta, resolvedText)
   const result = await graphql(UPDATE_COMMENT, { commentId, body: newBody })
+  return result.updateDiscussionComment.comment
+}
+
+/**
+ * Unresolve a comment by removing the resolved flag and "(Resolved)" prefix.
+ * @param {string} commentId - The comment ID
+ * @param {string} currentBody - The current comment body
+ * @returns {Promise<object>}
+ */
+export async function unresolveComment(commentId, currentBody) {
+  const { meta, text } = parseMetadata(currentBody)
+  const newMeta = { ...meta }
+  delete newMeta.resolved
+  const cleanText = text.replace(/^\(Resolved\)\s*/, '')
+  const newBody = serializeMetadata(newMeta, cleanText)
+  const result = await graphql(UPDATE_COMMENT, { commentId, body: newBody })
+  return result.updateDiscussionComment.comment
+}
+
+/**
+ * Edit a comment's text, preserving its metadata.
+ * @param {string} commentId - The comment ID
+ * @param {string} currentBody - The current comment body (with metadata)
+ * @param {string} newText - The new text content
+ * @returns {Promise<object>}
+ */
+export async function editComment(commentId, currentBody, newText) {
+  const { meta } = parseMetadata(currentBody)
+  const newBody = meta ? serializeMetadata(meta, newText) : newText
+  const result = await graphql(UPDATE_COMMENT, { commentId, body: newBody })
+  return result.updateDiscussionComment.comment
+}
+
+/**
+ * Edit a reply's text (replies have no metadata).
+ * @param {string} replyId - The reply ID
+ * @param {string} newText - The new text content
+ * @returns {Promise<object>}
+ */
+export async function editReply(replyId, newText) {
+  const result = await graphql(UPDATE_COMMENT, { commentId: replyId, body: newText })
   return result.updateDiscussionComment.comment
 }
 
