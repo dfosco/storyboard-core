@@ -17,7 +17,7 @@ const router = createBrowserRouter(routes, {
 installHashPreserver(router, import.meta.env.BASE_URL)
 installHideParamListener()
 installHistorySync()
-if (import.meta.env.DEV) mountDevTools()
+mountDevTools()
 
 const rootElement = document.getElementById('root')
 const root = createRoot(rootElement)
