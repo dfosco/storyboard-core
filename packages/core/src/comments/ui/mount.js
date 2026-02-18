@@ -35,11 +35,6 @@ function ensureOverlay() {
   overlay.style.zIndex = '99998'
   container.appendChild(overlay)
 
-  overlay.addEventListener('click', (e) => {
-    if (!isCommentModeActive()) return
-    handleOverlayClick(e)
-  })
-
   return overlay
 }
 
@@ -199,9 +194,7 @@ function setBodyCommentMode(active) {
   if (active) {
     document.body.classList.add('sb-comment-mode')
     showBanner()
-    const ov = ensureOverlay()
-    ov.classList.remove('pe-none')
-    ov.classList.add('pe-auto')
+    ensureOverlay()
     renderCachedPins()
     loadAndRenderComments()
   } else {
@@ -214,8 +207,8 @@ function setBodyCommentMode(active) {
     closeCommentWindow()
     clearPins()
     if (overlay) {
-      overlay.classList.remove('pe-auto')
-      overlay.classList.add('pe-none')
+      overlay.remove()
+      overlay = null
     }
   }
 }
@@ -236,6 +229,17 @@ export function mountComments() {
   Alpine.start()
 
   subscribeToCommentMode(setBodyCommentMode)
+
+  // Click handler for placing comments — uses document so devtools/modals can be excluded
+  document.addEventListener('click', (e) => {
+    if (!isCommentModeActive()) return
+    // Let devtools, modals, drawers, and existing comment UI handle their own clicks
+    if (e.target.closest('.sb-devtools-wrapper') || e.target.closest('.sb-auth-backdrop') ||
+        e.target.closest('.sb-comments-drawer') || e.target.closest('.sb-comments-drawer-backdrop') ||
+        e.target.closest('.sb-composer') || e.target.closest('.sb-comment-pin') ||
+        e.target.closest('.sb-comment-window')) return
+    handleOverlayClick(e)
+  })
 
   window.addEventListener('keydown', (e) => {
     const tag = e.target.tagName
