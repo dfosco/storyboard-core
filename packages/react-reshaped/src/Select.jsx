@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useContext, useState, useEffect } from 'react'
 import { Select as ReshapedSelect } from 'reshaped'
-import { FormContext, useOverride } from '@storyboard/react'
+import { FormContext, useOverride } from '@dfosco/storyboard-react'
 
 /**
  * Wrapped Reshaped Select that integrates with StoryboardForm.

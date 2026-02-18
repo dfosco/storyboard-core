@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { useSearchParams } from 'react-router-dom'
 import { Text } from '@primer/react'
-import { loadScene } from '@storyboard/core'
+import { loadScene } from '@dfosco/storyboard-core'
 import styles from './SceneDebug.module.css'
 
 /**

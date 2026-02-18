@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useRef, useCallback } from 'react'
-import { FormContext } from '@storyboard/react'
-import { setParam } from '@storyboard/core'
+import { FormContext } from '@dfosco/storyboard-react'
+import { setParam } from '@dfosco/storyboard-core'
 
 /**
  * A form wrapper that buffers input values locally and only

@@ -7,8 +7,8 @@ import './reset.css'
 import './globals.css'
 
 import ColorModeSwitcher from './components/ColorModeSwitcher'
-import { installHashPreserver } from '@storyboard/react/hash-preserver'
-import { installHideParamListener, installHistorySync, mountDevTools } from '@storyboard/core'
+import { installHashPreserver } from '@dfosco/storyboard-react/hash-preserver'
+import { installHideParamListener, installHistorySync, mountDevTools } from '@dfosco/storyboard-core'
 
 const router = createBrowserRouter(routes, {
     basename: import.meta.env.BASE_URL,

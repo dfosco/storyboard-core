@@ -1,10 +1,10 @@
 import { useCallback, useContext, useSyncExternalStore } from 'react'
 import { StoryboardContext } from '../StoryboardContext.js'
-import { getByPath } from '@storyboard/core'
-import { getParam, setParam, removeParam } from '@storyboard/core'
-import { subscribeToHash } from '@storyboard/core'
-import { isHideMode, getShadow, setShadow, removeShadow } from '@storyboard/core'
-import { subscribeToStorage, getStorageSnapshot } from '@storyboard/core'
+import { getByPath } from '@dfosco/storyboard-core'
+import { getParam, setParam, removeParam } from '@dfosco/storyboard-core'
+import { subscribeToHash } from '@dfosco/storyboard-core'
+import { isHideMode, getShadow, setShadow, removeShadow } from '@dfosco/storyboard-core'
+import { subscribeToStorage, getStorageSnapshot } from '@dfosco/storyboard-core'
 
 /**
  * Read/write overrides on top of scene data.

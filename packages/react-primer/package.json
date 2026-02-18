@@ -1,10 +1,10 @@
 {
-  "name": "@storyboard/react-primer",
+  "name": "@dfosco/storyboard-react-primer",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@storyboard/react": "*",
+    "@dfosco/storyboard-react": "*",
     "@primer/react": "^38.5.0",
     "@primer/octicons-react": "^19.21.1"
   },

@@ -1,6 +1,6 @@
 import { useCallback, useSyncExternalStore } from 'react'
-import { isHideMode, activateHideMode, deactivateHideMode } from '@storyboard/core'
-import { subscribeToStorage, getStorageSnapshot } from '@storyboard/core'
+import { isHideMode, activateHideMode, deactivateHideMode } from '@dfosco/storyboard-core'
+import { subscribeToStorage, getStorageSnapshot } from '@dfosco/storyboard-core'
 
 /**
  * Read/control hide mode.

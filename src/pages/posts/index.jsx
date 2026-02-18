@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Text } from '@primer/react'
 import Application from '../../templates/Application/Application.jsx'
-import { useRecords } from '@storyboard/react'
+import { useRecords } from '@dfosco/storyboard-react'
 
 /**
  * Blog post listing page.

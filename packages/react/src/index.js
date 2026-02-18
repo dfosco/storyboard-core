@@ -1,5 +1,5 @@
 /**
- * @storyboard/react — React framework binding for Storyboard.
+ * @dfosco/storyboard-react — React framework binding for Storyboard.
  *
  * Provides hooks, context, and provider for React apps.
  * Design-system-agnostic — no Primer, Reshaped, or other UI library deps.

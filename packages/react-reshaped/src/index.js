@@ -1,5 +1,5 @@
 /**
- * @storyboard/reshaped — Reshaped design system package for Storyboard.
+ * @dfosco/storyboard-react-reshaped — Reshaped design system package for Storyboard.
  *
  * Provides storyboard-aware form components backed by Reshaped.
  */

@@ -4,7 +4,7 @@
  * Framework-agnostic: creates a DOM element, no React/Vue/etc. needed.
  *
  * Usage:
- *   import { mountSceneDebug } from '@storyboard/core'
+ *   import { mountSceneDebug } from '@dfosco/storyboard-core'
  *   mountSceneDebug(document.getElementById('debug'))
  *   // or
  *   mountSceneDebug() // appends to document.body

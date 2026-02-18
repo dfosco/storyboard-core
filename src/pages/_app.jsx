@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import { Outlet } from 'react-router-dom'
-import { StoryboardProvider } from '@storyboard/react'
+import { StoryboardProvider } from '@dfosco/storyboard-react'
 
 function PageLoading() {
   return (

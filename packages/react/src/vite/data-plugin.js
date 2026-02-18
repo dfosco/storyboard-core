@@ -75,7 +75,7 @@ function generateModule(index) {
   }
 
   return [
-    `import { init } from '@storyboard/core'`,
+    `import { init } from '@dfosco/storyboard-core'`,
     '',
     declarations.join('\n'),
     '',

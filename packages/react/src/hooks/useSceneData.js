@@ -1,10 +1,10 @@
 import { useContext, useMemo, useSyncExternalStore } from 'react'
 import { StoryboardContext } from '../StoryboardContext.js'
-import { getByPath, deepClone, setByPath } from '@storyboard/core'
-import { getParam, getAllParams } from '@storyboard/core'
-import { subscribeToHash, getHashSnapshot } from '@storyboard/core'
-import { isHideMode, getShadow, getAllShadows } from '@storyboard/core'
-import { subscribeToStorage, getStorageSnapshot } from '@storyboard/core'
+import { getByPath, deepClone, setByPath } from '@dfosco/storyboard-core'
+import { getParam, getAllParams } from '@dfosco/storyboard-core'
+import { subscribeToHash, getHashSnapshot } from '@dfosco/storyboard-core'
+import { isHideMode, getShadow, getAllShadows } from '@dfosco/storyboard-core'
+import { subscribeToStorage, getStorageSnapshot } from '@dfosco/storyboard-core'
 
 /**
  * Access scene data by dot-notation path.

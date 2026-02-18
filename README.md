@@ -265,7 +265,7 @@ Use `useRecord()` for a single entry (matched by URL param) or `useRecords()` fo
 
 ```jsx
 // src/pages/posts/[slug].jsx — detail page
-import { useRecord } from '@storyboard/react'
+import { useRecord } from '@dfosco/storyboard-react'
 
 function BlogPost() {
   const post = useRecord('posts', 'slug')
@@ -276,7 +276,7 @@ function BlogPost() {
 
 ```jsx
 // src/pages/posts/index.jsx — list page
-import { useRecords } from '@storyboard/react'
+import { useRecords } from '@dfosco/storyboard-react'
 
 function BlogIndex() {
   const posts = useRecords('posts')
@@ -291,7 +291,7 @@ function BlogIndex() {
 Use `useRecordOverride()` to override a specific field on a specific entry. The override is stored in the URL hash:
 
 ```jsx
-import { useRecordOverride } from '@storyboard/react'
+import { useRecordOverride } from '@dfosco/storyboard-react'
 
 // Override the title of a specific post
 const [title, setTitle] = useRecordOverride('posts', 'welcome-to-storyboard', 'title')
@@ -336,7 +336,7 @@ This is a convention, not a hard rule — but it's the recommended way to simula
 Use `useSceneData()` to read data from the current scene. Supports dot-notation for nested access.
 
 ```jsx
-import { useSceneData } from '@storyboard/react'
+import { useSceneData } from '@dfosco/storyboard-react'
 
 function UserCard() {
   const user = useSceneData('user')
@@ -363,7 +363,7 @@ function UserCard() {
 Use `useOverride()` when you need to **write** an override. Values are stored in the **URL hash** (`#key=value`) so they persist across page refreshes and can be shared by copying the URL.
 
 ```jsx
-import { useOverride } from '@storyboard/react'
+import { useOverride } from '@dfosco/storyboard-react'
 
 const [value, setValue, clearValue] = useOverride('path.to.value')
 ```
@@ -387,7 +387,7 @@ If the user hasn't overridden anything, they see the scene default. Once they in
 ### Example: Updating user info with buttons
 
 ```jsx
-import { useOverride } from '@storyboard/react'
+import { useOverride } from '@dfosco/storyboard-react'
 import { Button, ButtonGroup } from '@primer/react'
 
 function UserSwitcher() {
@@ -473,7 +473,7 @@ No parameter defaults to `?scene=default`.
 ### Programmatically
 
 ```jsx
-import { useScene } from '@storyboard/react'
+import { useScene } from '@dfosco/storyboard-react'
 import { Button } from '@primer/react'
 
 function ScenePicker() {
@@ -532,7 +532,7 @@ Hash is **not** preserved when:
 
 ## API Reference
 
-### Hooks (`@storyboard/react`)
+### Hooks (`@dfosco/storyboard-react`)
 
 | Hook | Returns | Description |
 |------|---------|-------------|
@@ -551,7 +551,7 @@ Hash is **not** preserved when:
 
 | Component | Package | Description |
 |-----------|---------|-------------|
-| `<StoryboardProvider>` | `@storyboard/react` | Wraps the app. Loads scene from `?scene=` param. Already configured in `src/pages/_app.jsx`. |
+| `<StoryboardProvider>` | `@dfosco/storyboard-react` | Wraps the app. Loads scene from `?scene=` param. Already configured in `src/pages/_app.jsx`. |
 | `<DevTools>` | `@storyboard/primer` | Floating debug panel showing current scene, hash params, and scene data. Already configured in `src/index.jsx`. |
 | `<SceneDebug>` | `@storyboard/primer` | Renders resolved scene data as formatted JSON. |
 | `<SceneDataDemo>` | `@storyboard/primer` | Interactive demo of scene data and overrides. |
@@ -563,7 +563,7 @@ Hash is **not** preserved when:
 
 > **Reshaped equivalents:** `StoryboardForm`, `TextInput`, `Textarea`, `Select`, and `Checkbox` are also available from `@storyboard/reshaped` with the same API but Reshaped styling.
 
-### Utilities (`@storyboard/core`)
+### Utilities (`@dfosco/storyboard-core`)
 
 | Function | Description |
 |----------|-------------|
@@ -587,7 +587,7 @@ Hash is **not** preserved when:
 | `installHideParamListener()` | Listens for `?hide` / `?show` URL params to toggle hide mode. |
 | `installHistorySync()` | Syncs hash changes to the undo/redo history stack. |
 
-### Utilities (`@storyboard/react`)
+### Utilities (`@dfosco/storyboard-react`)
 
 | Function | Description |
 |----------|-------------|
@@ -621,20 +621,20 @@ The storyboard system is organized as an npm workspace with four packages:
 
 ```
 packages/
-├── core/      ← @storyboard/core — Framework-agnostic (pure JS, zero dependencies)
-├── react/     ← @storyboard/react — React hooks, context, provider (design-system agnostic)
+├── core/      ← @dfosco/storyboard-core — Framework-agnostic (pure JS, zero dependencies)
+├── react/     ← @dfosco/storyboard-react — React hooks, context, provider (design-system agnostic)
 ├── primer/    ← @storyboard/primer — Primer React form components, DevTools
 └── reshaped/  ← @storyboard/reshaped — Reshaped form components
 ```
 
 | Package | Purpose | Import |
 |---------|---------|--------|
-| `@storyboard/core` | Data loading, URL hash state, dot-path utilities, localStorage, hide mode | `import { loadScene, getParam } from '@storyboard/core'` |
-| `@storyboard/react` | Provider, hooks (`useSceneData`, `useOverride`, `useRecord`, etc.), hash preserver | `import { useSceneData } from '@storyboard/react'` |
+| `@dfosco/storyboard-core` | Data loading, URL hash state, dot-path utilities, localStorage, hide mode | `import { loadScene, getParam } from '@dfosco/storyboard-core'` |
+| `@dfosco/storyboard-react` | Provider, hooks (`useSceneData`, `useOverride`, `useRecord`, etc.), hash preserver | `import { useSceneData } from '@dfosco/storyboard-react'` |
 | `@storyboard/primer` | Primer-styled form inputs, DevTools, SceneDebug | `import { TextInput, DevTools } from '@storyboard/primer'` |
 | `@storyboard/reshaped` | Reshaped-styled form inputs (same API as Primer) | `import { TextInput } from '@storyboard/reshaped'` |
 
-**For non-React frontends** (Alpine.js, Vue, Svelte, vanilla JS), import only from `@storyboard/core`:
+**For non-React frontends** (Alpine.js, Vue, Svelte, vanilla JS), import only from `@dfosco/storyboard-core`:
 
 ```js
 import {
@@ -642,7 +642,7 @@ import {
   getByPath, setByPath, deepClone,
   getParam, setParam, getAllParams, removeParam,
   subscribeToHash, getHashSnapshot,
-} from '@storyboard/core'
+} from '@dfosco/storyboard-core'
 
 // 1. Seed the data index (the Vite plugin does this automatically)
 init({ scenes: { ... }, objects: { ... }, records: { ... } })

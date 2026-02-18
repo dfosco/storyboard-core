@@ -10,7 +10,7 @@
  *  - Cmd+. (Mac) / Ctrl+. (other) toggles visibility
  *
  * Usage:
- *   import { mountDevTools } from '@storyboard/core'
+ *   import { mountDevTools } from '@dfosco/storyboard-core'
  *   mountDevTools() // call once at app startup
  */
 import { loadScene } from './loader.js'

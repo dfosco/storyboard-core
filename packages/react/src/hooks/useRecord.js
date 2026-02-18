@@ -1,9 +1,9 @@
 import { useMemo, useSyncExternalStore } from 'react'
 import { useParams } from 'react-router-dom'
-import { loadRecord } from '@storyboard/core'
-import { deepClone, setByPath } from '@storyboard/core'
-import { getAllParams } from '@storyboard/core'
-import { subscribeToHash, getHashSnapshot } from '@storyboard/core'
+import { loadRecord } from '@dfosco/storyboard-core'
+import { deepClone, setByPath } from '@dfosco/storyboard-core'
+import { getAllParams } from '@dfosco/storyboard-core'
+import { subscribeToHash, getHashSnapshot } from '@dfosco/storyboard-core'
 
 /**
  * Collect hash overrides for a record and merge them into the base array.
