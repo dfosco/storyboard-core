@@ -3,8 +3,15 @@
   "version": "1.0.1",
   "private": true,
   "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dfosco/storyboard.git",
+    "directory": "packages/react-reshaped"
+  },
+  "files": ["src"],
   "dependencies": {
-    "@dfosco/storyboard-react": "*",
+    "@dfosco/storyboard-react": "workspace:*",
     "reshaped": "^3.9.0"
   },
   "exports": {
