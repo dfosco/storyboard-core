@@ -1,14 +1,32 @@
+import { useEffect, useLayoutEffect } from 'react'
 import { useTheme, ActionMenu, ActionList, Stack } from '@primer/react'
 import { SunIcon, MoonIcon } from '@primer/octicons-react'
 
 import styles from './ColorModeSwitcher.module.css'
 
+const THEME_STORAGE_KEY = 'sb-color-scheme'
+
 function ColorModeSwitcher() {
     const { setDayScheme, setNightScheme, colorScheme } = useTheme()
+
+    // On mount, restore saved theme from localStorage
+    useEffect(() => {
+        const saved = localStorage.getItem(THEME_STORAGE_KEY)
+        if (saved) {
+            setDayScheme(saved)
+            setNightScheme(saved)
+        }
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Keep data-sb-theme attribute in sync
+    useLayoutEffect(() => {
+        document.documentElement.setAttribute('data-sb-theme', colorScheme)
+    }, [colorScheme])
 
     const setScheme = (schemeValue) => {
         setDayScheme(schemeValue)
         setNightScheme(schemeValue)
+        localStorage.setItem(THEME_STORAGE_KEY, schemeValue)
     }
 
     const schemes = [

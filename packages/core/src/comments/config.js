@@ -10,8 +10,10 @@ let _config = null
 /**
  * Initialize comments config from storyboard.config.json contents.
  * @param {object} rawConfig - The parsed storyboard.config.json object
+ * @param {object} [options] - Additional options
+ * @param {string} [options.basePath] - Base URL path for filtering comments (e.g. "/storyboard-source/")
  */
-export function initCommentsConfig(rawConfig) {
+export function initCommentsConfig(rawConfig, options = {}) {
   if (!rawConfig || !rawConfig.comments) {
     _config = null
     return
@@ -25,6 +27,7 @@ export function initCommentsConfig(rawConfig) {
     discussions: {
       category: c.discussions?.category ?? 'Storyboard Comments',
     },
+    basePath: options.basePath ?? '/',
   }
 }
 

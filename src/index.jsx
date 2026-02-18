@@ -20,7 +20,7 @@ const router = createBrowserRouter(routes, {
 installHashPreserver(router, import.meta.env.BASE_URL)
 installHideParamListener()
 installHistorySync()
-initCommentsConfig(storyboardConfig)
+initCommentsConfig(storyboardConfig, { basePath: import.meta.env.BASE_URL })
 mountDevTools({ basePath: import.meta.env.BASE_URL })
 mountComments()
 
