@@ -17,6 +17,7 @@ describe('initCommentsConfig', () => {
     expect(config).toEqual({
       repo: { owner: 'dfosco', name: 'storyboard' },
       discussions: { category: 'Comments' },
+      basePath: '/',
     })
   })
 

@@ -1,221 +1,12 @@
 /**
- * Auth modal — vanilla JS modal for entering a GitHub PAT.
+ * Auth modal — Alpine.js modal for entering a GitHub PAT.
  *
- * Styled to match the devtools dark theme. Uses the native <dialog> element.
+ * Styled with Tachyons + sb-* custom classes for light/dark mode support.
  */
 
 import { setToken, validateToken, clearToken, getCachedUser } from '../auth.js'
 
 const MODAL_ID = 'sb-auth-modal'
-const STYLE_ID = 'sb-auth-modal-style'
-
-function injectStyles() {
-  if (document.getElementById(STYLE_ID)) return
-  const style = document.createElement('style')
-  style.id = STYLE_ID
-  style.textContent = `
-    .sb-auth-backdrop {
-      position: fixed;
-      inset: 0;
-      z-index: 100000;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    }
-
-    .sb-auth-modal {
-      width: 420px;
-      max-width: calc(100vw - 32px);
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 12px;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
-      color: #c9d1d9;
-      overflow: hidden;
-    }
-
-    .sb-auth-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 20px;
-      border-bottom: 1px solid #21262d;
-    }
-
-    .sb-auth-header h2 {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 600;
-      color: #f0f6fc;
-    }
-
-    .sb-auth-close {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      background: none;
-      border: none;
-      border-radius: 6px;
-      color: #8b949e;
-      cursor: pointer;
-      font-size: 18px;
-      line-height: 1;
-    }
-    .sb-auth-close:hover {
-      background: #21262d;
-      color: #c9d1d9;
-    }
-
-    .sb-auth-body {
-      padding: 20px;
-    }
-
-    .sb-auth-description {
-      margin: 0 0 16px;
-      font-size: 13px;
-      color: #8b949e;
-      line-height: 1.5;
-    }
-
-    .sb-auth-description a {
-      color: #58a6ff;
-      text-decoration: none;
-    }
-    .sb-auth-description a:hover {
-      text-decoration: underline;
-    }
-
-    .sb-auth-label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #c9d1d9;
-    }
-
-    .sb-auth-input {
-      width: 100%;
-      padding: 8px 12px;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      color: #c9d1d9;
-      font-size: 14px;
-      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-      outline: none;
-      box-sizing: border-box;
-    }
-    .sb-auth-input:focus {
-      border-color: #58a6ff;
-      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
-    }
-    .sb-auth-input::placeholder {
-      color: #484f58;
-    }
-
-    .sb-auth-scopes {
-      margin: 12px 0 0;
-      padding: 10px 12px;
-      background: #0d1117;
-      border: 1px solid #21262d;
-      border-radius: 6px;
-      font-size: 12px;
-      color: #8b949e;
-      line-height: 1.6;
-    }
-    .sb-auth-scopes code {
-      display: inline-block;
-      padding: 1px 5px;
-      background: rgba(110, 118, 129, 0.15);
-      border-radius: 4px;
-      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-      font-size: 11px;
-      color: #c9d1d9;
-    }
-
-    .sb-auth-footer {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      padding: 16px 20px;
-      border-top: 1px solid #21262d;
-    }
-
-    .sb-auth-btn {
-      padding: 6px 16px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
-      font-family: inherit;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: background 100ms ease;
-    }
-
-    .sb-auth-btn-cancel {
-      background: #21262d;
-      border-color: #30363d;
-      color: #c9d1d9;
-    }
-    .sb-auth-btn-cancel:hover {
-      background: #30363d;
-    }
-
-    .sb-auth-btn-submit {
-      background: #238636;
-      color: #fff;
-    }
-    .sb-auth-btn-submit:hover {
-      background: #2ea043;
-    }
-    .sb-auth-btn-submit:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .sb-auth-error {
-      margin: 10px 0 0;
-      padding: 8px 12px;
-      background: rgba(248, 81, 73, 0.1);
-      border: 1px solid rgba(248, 81, 73, 0.3);
-      border-radius: 6px;
-      font-size: 13px;
-      color: #f85149;
-    }
-
-    .sb-auth-success {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 4px 0;
-    }
-
-    .sb-auth-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 2px solid #30363d;
-    }
-
-    .sb-auth-user-info {
-      font-size: 14px;
-      color: #f0f6fc;
-    }
-    .sb-auth-user-info span {
-      display: block;
-      font-size: 12px;
-      color: #3fb950;
-      margin-top: 2px;
-    }
-  `
-  document.head.appendChild(style)
-}
 
 /**
  * Open the auth modal. Returns a promise that resolves with the user info
@@ -223,61 +14,62 @@ function injectStyles() {
  * @returns {Promise<{ login: string, avatarUrl: string }|null>}
  */
 export function openAuthModal() {
-  injectStyles()
-
   return new Promise((resolve) => {
-    // Remove any existing modal
     const existing = document.getElementById(MODAL_ID)
     if (existing) existing.remove()
 
     const backdrop = document.createElement('div')
     backdrop.id = MODAL_ID
-    backdrop.className = 'sb-auth-backdrop'
+    backdrop.className = 'sb-auth-backdrop fixed top-0 right-0 bottom-0 left-0 flex items-center justify-center sans-serif'
+    backdrop.style.cssText = 'z-index:100000;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);'
 
-    const modal = document.createElement('div')
-    modal.className = 'sb-auth-modal'
-
-    modal.innerHTML = `
-      <div class="sb-auth-header">
-        <h2>Sign in for comments</h2>
-        <button class="sb-auth-close" data-action="close" aria-label="Close">×</button>
-      </div>
-      <div class="sb-auth-body">
-        <p class="sb-auth-description">
-          Enter a <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">GitHub Personal Access Token</a>
-          to leave comments on this prototype. Your token is stored locally in your browser.
-        </p>
-        <label class="sb-auth-label" for="sb-auth-token-input">Personal Access Token</label>
-        <input class="sb-auth-input" id="sb-auth-token-input" type="password" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off" spellcheck="false" />
-        <div class="sb-auth-scopes">Required scopes: <code>repo</code> <code>read:user</code></div>
-        <div data-slot="feedback"></div>
-      </div>
-      <div class="sb-auth-footer">
-        <button class="sb-auth-btn sb-auth-btn-cancel" data-action="close">Cancel</button>
-        <button class="sb-auth-btn sb-auth-btn-submit" data-action="submit">Sign in</button>
+    backdrop.innerHTML = `
+      <div class="sb-bg ba sb-b-default br3 sb-shadow sb-fg overflow-hidden" style="width:420px;max-width:calc(100vw - 32px)" x-data="sbAuthModal">
+        <div class="flex items-center justify-between ph4 pv3 bb sb-b-muted">
+          <h2 class="ma0 f5 fw6 sb-fg">Sign in for comments</h2>
+          <button class="flex items-center justify-center bg-transparent bn br2 sb-fg-muted pointer" style="width:28px;height:28px;font-size:18px;line-height:1" @click="close()" aria-label="Close">×</button>
+        </div>
+        <div class="pa4">
+          <p class="ma0 mb3 lh-copy sb-fg-muted" style="font-size:13px">
+            Enter a <a class="sb-fg-accent no-underline" href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">GitHub Personal Access Token</a>
+            to leave comments on this prototype. Your token is stored locally in your browser.
+          </p>
+          <label class="db mb1 fw5 sb-fg" style="font-size:13px" for="sb-auth-token-input">Personal Access Token</label>
+          <input class="sb-input w-100 ph3 pv2 br2 f6 code db" style="box-sizing:border-box" id="sb-auth-token-input" type="password"
+                 placeholder="ghp_xxxxxxxxxxxx" autocomplete="off" spellcheck="false"
+                 x-model="token" @keydown.enter="submit()" />
+          <div class="mt2 ph3 pv2 sb-bg-inset ba sb-b-muted br2 f7 sb-fg-muted lh-copy">Required scopes: <code class="dib ph1 sb-bg-muted br1 code sb-fg" style="font-size:11px;padding-top:1px;padding-bottom:1px">repo</code> <code class="dib ph1 sb-bg-muted br1 code sb-fg" style="font-size:11px;padding-top:1px;padding-bottom:1px">read:user</code></div>
+          <template x-if="error">
+            <div class="mt2 ph3 pv2 br2 sb-fg-danger" style="font-size:13px;background:color-mix(in srgb, var(--sb-fg-danger) 10%, transparent);border:1px solid color-mix(in srgb, var(--sb-fg-danger) 30%, transparent)" x-text="error"></div>
+          </template>
+          <template x-if="user">
+            <div class="flex items-center pv1">
+              <img class="br-100 ba sb-b-default mr3" style="width:40px;height:40px;border-width:2px" :src="user.avatarUrl" :alt="user.login" />
+              <div class="f6 sb-fg">
+                <span x-text="user.login"></span>
+                <span class="db f7 sb-fg-success mt1">✓ Signed in</span>
+              </div>
+            </div>
+          </template>
+        </div>
+        <div class="flex items-center justify-end ph4 pv3 bt sb-b-muted">
+          <button class="sb-btn-cancel ph3 pv1 br2 fw5 sans-serif pointer mr2" style="font-size:13px" @click="close()">Cancel</button>
+          <button class="sb-btn-success ph3 pv1 br2 fw5 sans-serif pointer bn" style="font-size:13px" :disabled="submitting"
+                  @click="user ? done() : submit()" x-text="user ? 'Done' : (submitting ? 'Validating…' : 'Sign in')">
+            Sign in
+          </button>
+        </div>
       </div>
     `
 
-    backdrop.appendChild(modal)
     document.body.appendChild(backdrop)
-
-    const input = modal.querySelector('#sb-auth-token-input')
-    const submitBtn = modal.querySelector('[data-action="submit"]')
-    const feedbackSlot = modal.querySelector('[data-slot="feedback"]')
-
-    function close(result) {
-      backdrop.remove()
-      resolve(result)
-    }
 
     // Close on backdrop click
     backdrop.addEventListener('click', (e) => {
-      if (e.target === backdrop) close(null)
-    })
-
-    // Close buttons
-    modal.querySelectorAll('[data-action="close"]').forEach((btn) => {
-      btn.addEventListener('click', () => close(null))
+      if (e.target === backdrop) {
+        backdrop.remove()
+        resolve(null)
+      }
     })
 
     // Escape key
@@ -286,56 +78,62 @@ export function openAuthModal() {
         e.preventDefault()
         e.stopPropagation()
         window.removeEventListener('keydown', onKeyDown, true)
-        close(null)
+        backdrop.remove()
+        resolve(null)
       }
     }
     window.addEventListener('keydown', onKeyDown, true)
 
-    // Submit
-    async function submit() {
-      const token = input.value.trim()
-      if (!token) {
-        input.focus()
-        return
-      }
+    // Register Alpine component
+    if (!window.Alpine._sbAuthRegistered) {
+      window.Alpine.data('sbAuthModal', () => ({
+        token: '',
+        submitting: false,
+        error: null,
+        user: null,
 
-      submitBtn.disabled = true
-      submitBtn.textContent = 'Validating…'
-      feedbackSlot.innerHTML = ''
+        async submit() {
+          const val = this.token.trim()
+          if (!val) return
 
-      try {
-        const user = await validateToken(token)
-        setToken(token)
+          this.submitting = true
+          this.error = null
 
-        feedbackSlot.innerHTML = `
-          <div class="sb-auth-success">
-            <img class="sb-auth-avatar" src="${user.avatarUrl}" alt="${user.login}" />
-            <div class="sb-auth-user-info">
-              ${user.login}
-              <span>✓ Signed in</span>
-            </div>
-          </div>
-        `
-        submitBtn.textContent = 'Done'
-        submitBtn.disabled = false
-        submitBtn.onclick = () => {
+          try {
+            const user = await validateToken(val)
+            setToken(val)
+            this.user = user
+          } catch (err) {
+            this.error = err.message
+          } finally {
+            this.submitting = false
+          }
+        },
+
+        done() {
           window.removeEventListener('keydown', onKeyDown, true)
-          close(user)
-        }
-      } catch (err) {
-        feedbackSlot.innerHTML = `<div class="sb-auth-error">${err.message}</div>`
-        submitBtn.disabled = false
-        submitBtn.textContent = 'Sign in'
-      }
+          const user = this.user
+          backdrop.remove()
+          resolve(user)
+        },
+
+        close() {
+          window.removeEventListener('keydown', onKeyDown, true)
+          backdrop.remove()
+          resolve(null)
+        },
+      }))
+      window.Alpine._sbAuthRegistered = true
     }
 
-    submitBtn.addEventListener('click', submit)
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submit()
-    })
+    // Initialize Alpine on the new DOM
+    window.Alpine.initTree(backdrop)
 
-    // Auto-focus
-    requestAnimationFrame(() => input.focus())
+    // Auto-focus the input
+    requestAnimationFrame(() => {
+      const input = backdrop.querySelector('#sb-auth-token-input')
+      if (input) input.focus()
+    })
   })
 }
 

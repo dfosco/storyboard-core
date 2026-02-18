@@ -15,6 +15,7 @@
  */
 import { loadScene } from './loader.js'
 import { isCommentsEnabled } from './comments/config.js'
+import { isHideMode, activateHideMode, deactivateHideMode } from './hideMode.js'
 
 const STYLES = `
 .sb-devtools-wrapper {
@@ -158,6 +159,8 @@ const INFO_ICON = '<svg viewBox="0 0 16 16"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0
 const SYNC_ICON = '<svg viewBox="0 0 16 16"><path d="M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z"/></svg>'
 const VIEWFINDER_ICON = '<svg viewBox="0 0 16 16"><path d="M8.5 1.75a.75.75 0 0 0-1.5 0V3H1.75a.75.75 0 0 0 0 1.5H3v6H1.75a.75.75 0 0 0 0 1.5H7v1.25a.75.75 0 0 0 1.5 0V12h5.25a.75.75 0 0 0 0-1.5H12v-6h1.75a.75.75 0 0 0 0-1.5H8.5Zm2 8.75h-5a.25.25 0 0 1-.25-.25v-4.5A.25.25 0 0 1 5.5 5.5h5a.25.25 0 0 1 .25.25v4.5a.25.25 0 0 1-.25.25Z"/></svg>'
 const X_ICON = '<svg viewBox="0 0 16 16"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg>'
+const EYE_ICON = '<svg viewBox="0 0 16 16"><path d="M8 2c1.981 0 3.671.992 4.933 2.078 1.27 1.091 2.187 2.345 2.637 3.023a1.62 1.62 0 0 1 0 1.798c-.45.678-1.367 1.932-2.637 3.023C11.67 13.008 9.981 14 8 14s-3.671-.992-4.933-2.078C1.797 10.831.88 9.577.43 8.899a1.62 1.62 0 0 1 0-1.798c.45-.678 1.367-1.932 2.637-3.023C4.33 2.992 6.019 2 8 2ZM1.679 7.932a.12.12 0 0 0 0 .136c.411.622 1.241 1.75 2.366 2.717C5.176 11.758 6.527 12.5 8 12.5s2.823-.742 3.955-1.715c1.124-.967 1.954-2.096 2.366-2.717a.12.12 0 0 0 0-.136c-.412-.621-1.242-1.75-2.366-2.717C10.824 4.242 9.473 3.5 8 3.5s-2.824.742-3.955 1.715c-1.124.967-1.954 2.096-2.366 2.717ZM8 10a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 10Z"/></svg>'
+const EYE_CLOSED_ICON = '<svg viewBox="0 0 16 16"><path d="M.143 2.31a.75.75 0 0 1 1.047-.167l14.5 10.5a.75.75 0 1 1-.88 1.214l-2.248-1.628C11.346 13.19 9.792 14 8 14c-1.981 0-3.671-.992-4.933-2.078C1.797 10.831.88 9.577.43 8.899a1.62 1.62 0 0 1 0-1.798c.35-.527 1.06-1.476 2.019-2.398L.31 3.357A.75.75 0 0 1 .143 2.31Zm3.386 3.378a14.21 14.21 0 0 0-1.85 2.244.12.12 0 0 0 0 .136c.411.622 1.241 1.75 2.366 2.717C5.176 11.758 6.527 12.5 8 12.5c1.195 0 2.31-.488 3.29-1.191L9.063 9.695A2 2 0 0 1 6.058 7.39L3.529 5.688ZM8 3.5c-.516 0-1.017.09-1.499.251a.75.75 0 1 1-.473-1.423A6.23 6.23 0 0 1 8 2c1.981 0 3.671.992 4.933 2.078 1.27 1.091 2.187 2.345 2.637 3.023a1.62 1.62 0 0 1 0 1.798c-.11.166-.248.365-.41.587a.75.75 0 1 1-1.21-.887c.14-.191.26-.367.36-.524a.12.12 0 0 0 0-.136c-.412-.621-1.242-1.75-2.366-2.717C10.824 4.242 9.473 3.5 8 3.5Z"/></svg>'
 
 function getSceneName() {
   return new URLSearchParams(window.location.search).get('scene') || 'default'
@@ -212,6 +215,14 @@ export function mountDevTools(options = {}) {
   resetBtn.className = 'sb-devtools-menu-item'
   resetBtn.innerHTML = `${SYNC_ICON} Reset all params`
 
+  const hideModeBtn = document.createElement('button')
+  hideModeBtn.className = 'sb-devtools-menu-item'
+  function updateHideModeBtn() {
+    const active = isHideMode()
+    hideModeBtn.innerHTML = `${active ? EYE_ICON : EYE_CLOSED_ICON} ${active ? 'Show mode' : 'Hide mode'}`
+  }
+  updateHideModeBtn()
+
   const hint = document.createElement('div')
   hint.className = 'sb-devtools-hint'
   hint.innerHTML = 'Press <code>⌘ + .</code> to hide'
@@ -219,6 +230,7 @@ export function mountDevTools(options = {}) {
   menu.appendChild(viewfinderBtn)
   menu.appendChild(showInfoBtn)
   menu.appendChild(resetBtn)
+  menu.appendChild(hideModeBtn)
 
   // Comments menu items (injected dynamically if comments are enabled)
   function refreshCommentMenuItems() {
@@ -246,8 +258,11 @@ export function mountDevTools(options = {}) {
     })
   }
 
-  // Refresh comment items when menu opens
-  trigger.addEventListener('click', refreshCommentMenuItems)
+  // Refresh dynamic items when menu opens
+  trigger.addEventListener('click', () => {
+    refreshCommentMenuItems()
+    updateHideModeBtn()
+  })
 
   menu.appendChild(hint)
   wrapper.appendChild(menu)
@@ -337,6 +352,17 @@ export function mountDevTools(options = {}) {
 
   resetBtn.addEventListener('click', () => {
     window.location.hash = ''
+    menuOpen = false
+    menu.classList.remove('open')
+  })
+
+  hideModeBtn.addEventListener('click', () => {
+    if (isHideMode()) {
+      deactivateHideMode()
+    } else {
+      activateHideMode()
+    }
+    updateHideModeBtn()
     menuOpen = false
     menu.classList.remove('open')
   })

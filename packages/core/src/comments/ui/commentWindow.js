@@ -1,14 +1,13 @@
 /**
- * Comment window — vanilla JS popup that shows a comment thread with replies and reactions.
+ * Comment window — Alpine.js popup that shows a comment thread with replies and reactions.
  *
  * Opens when clicking a comment pin. Shows comment body, author, replies,
  * reply input, reactions, and supports drag-to-move.
+ * Styled with Tachyons + sb-* custom classes for light/dark mode support.
  */
 
-import { replyToComment, addReaction, removeReaction, moveComment, resolveComment, fetchRouteDiscussion } from '../api.js'
+import { replyToComment, addReaction, removeReaction, moveComment, resolveComment, unresolveComment, editComment, editReply, deleteComment, fetchRouteDiscussion } from '../api.js'
 import { getCachedUser } from '../auth.js'
-
-const STYLE_ID = 'sb-comment-window-style'
 
 const REACTION_EMOJI = {
   THUMBS_UP: '👍',
@@ -19,352 +18,6 @@ const REACTION_EMOJI = {
   HEART: '❤️',
   ROCKET: '🚀',
   EYES: '👀',
-}
-
-function injectStyles() {
-  if (document.getElementById(STYLE_ID)) return
-  const style = document.createElement('style')
-  style.id = STYLE_ID
-  style.textContent = `
-    .sb-comment-window {
-      position: absolute;
-      z-index: 100001;
-      width: 360px;
-      max-height: 480px;
-      display: flex;
-      flex-direction: column;
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      overflow: hidden;
-    }
-
-    .sb-comment-window-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 12px;
-      border-bottom: 1px solid #21262d;
-      cursor: grab;
-      user-select: none;
-    }
-    .sb-comment-window-header:active {
-      cursor: grabbing;
-    }
-
-    .sb-comment-window-header-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .sb-comment-window-avatar {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      border: 1px solid #30363d;
-      flex-shrink: 0;
-    }
-
-    .sb-comment-window-author {
-      font-size: 12px;
-      font-weight: 600;
-      color: #f0f6fc;
-    }
-
-    .sb-comment-window-time {
-      font-size: 11px;
-      color: #484f58;
-      margin-left: 4px;
-    }
-
-    .sb-comment-window-close {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      background: none;
-      border: none;
-      border-radius: 6px;
-      color: #8b949e;
-      cursor: pointer;
-      font-size: 16px;
-      line-height: 1;
-      flex-shrink: 0;
-    }
-    .sb-comment-window-close:hover {
-      background: #21262d;
-      color: #c9d1d9;
-    }
-
-    .sb-comment-window-header-actions {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      flex-shrink: 0;
-    }
-
-    .sb-comment-window-action-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px;
-      background: none;
-      border: none;
-      border-radius: 6px;
-      color: #8b949e;
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 500;
-      font-family: inherit;
-      line-height: 1;
-      flex-shrink: 0;
-      white-space: nowrap;
-    }
-    .sb-comment-window-action-btn:hover {
-      background: #21262d;
-      color: #c9d1d9;
-    }
-    .sb-comment-window-action-btn[data-resolved="true"] {
-      color: #3fb950;
-    }
-    .sb-comment-window-action-btn[data-copied="true"] {
-      color: #3fb950;
-    }
-
-    .sb-comment-window-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
-    }
-
-    .sb-comment-window-text {
-      font-size: 13px;
-      line-height: 1.5;
-      color: #c9d1d9;
-      margin: 0 0 8px;
-      word-break: break-word;
-    }
-
-    .sb-comment-window-reactions {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-
-    .sb-reaction-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid #30363d;
-      background: none;
-      color: #8b949e;
-      cursor: pointer;
-      // font-size: 12px;
-      font-family: inherit;
-      transition: border-color 100ms, background 100ms;
-    }
-    .sb-reaction-pill span {
-      // font-size: 12px;
-   }
-    .sb-reaction-pill:hover {
-      border-color: #8b949e;
-    }
-    .sb-reaction-pill[data-active="true"] {
-      border-color: rgba(88, 166, 255, 0.4);
-      background: rgba(88, 166, 255, 0.1);
-      color: #58a6ff;
-    }
-
-    .sb-reaction-add-btn {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 6px;
-      gap: 4px;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      background: none;
-      color: #8b949e;
-      font-size: 12px;
-      cursor: pointer;
-      font-family: inherit;
-      position: relative;
-      border-color: #30363d;
-      background: #21262d;
-    }
-    .sb-reaction-add-btn:hover {
-      border: 1px solid rgba(88, 166, 255, 0.4);
-      background: rgba(88, 166, 255, 0.1);
-    }
-
-    .sb-reaction-picker {
-      position: absolute;
-      bottom: 100%;
-      left: 0;
-      margin-bottom: 4px;
-      z-index: 10;
-      display: flex;
-      gap: 2px;
-      padding: 4px;
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    }
-
-    .sb-reaction-picker-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      border: none;
-      background: none;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background 100ms;
-    }
-    .sb-reaction-picker-btn:hover {
-      background: #21262d;
-    }
-    .sb-reaction-picker-btn[data-active="true"] {
-      background: rgba(88, 166, 255, 0.15);
-      box-shadow: inset 0 0 0 1px rgba(88, 166, 255, 0.4);
-    }
-
-    .sb-comment-window-replies {
-      border-top: 1px solid #21262d;
-      padding-top: 10px;
-      margin-top: 4px;
-    }
-
-    .sb-comment-window-replies-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #8b949e;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-    }
-
-    .sb-reply-item {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .sb-reply-avatar {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: 1px solid #30363d;
-      flex-shrink: 0;
-    }
-
-    .sb-reply-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .sb-reply-meta {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-bottom: 2px;
-    }
-
-    .sb-reply-author {
-      font-size: 12px;
-      font-weight: 600;
-      color: #f0f6fc;
-    }
-
-    .sb-reply-time {
-      font-size: 11px;
-      color: #484f58;
-    }
-
-    .sb-reply-text {
-      font-size: 13px;
-      line-height: 1.4;
-      color: #c9d1d9;
-      margin: 0;
-      word-break: break-word;
-    }
-
-    .sb-reply-reactions {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      flex-wrap: wrap;
-      margin-top: 4px;
-    }
-
-    .sb-comment-window-reply-form {
-      border-top: 1px solid #21262d;
-      padding: 10px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .sb-reply-textarea {
-      width: 100%;
-      min-height: 40px;
-      max-height: 100px;
-      padding: 6px 8px;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      color: #c9d1d9;
-      font-size: 12px;
-      font-family: inherit;
-      line-height: 1.4;
-      resize: vertical;
-      outline: none;
-      box-sizing: border-box;
-    }
-    .sb-reply-textarea:focus {
-      border-color: #58a6ff;
-      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
-    }
-    .sb-reply-textarea::placeholder {
-      color: #484f58;
-    }
-
-    .sb-reply-form-actions {
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .sb-reply-submit-btn {
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 500;
-      font-family: inherit;
-      cursor: pointer;
-      border: none;
-      background: #238636;
-      color: #fff;
-    }
-    .sb-reply-submit-btn:hover {
-      background: #2ea043;
-    }
-    .sb-reply-submit-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  `
-  document.head.appendChild(style)
 }
 
 function timeAgo(dateStr) {
@@ -379,7 +32,9 @@ function timeAgo(dateStr) {
  */
 function buildReactionBar(item) {
   const bar = document.createElement('div')
-  bar.className = item.replies ? 'sb-comment-window-reactions' : 'sb-reply-reactions'
+  bar.className = item.replies
+    ? 'flex items-center flex-wrap mb2'
+    : 'flex items-center flex-wrap mt1'
 
   function render() {
     bar.innerHTML = ''
@@ -391,9 +46,14 @@ function buildReactionBar(item) {
       if (count === 0) continue
 
       const pill = document.createElement('button')
-      pill.className = 'sb-reaction-pill'
+      pill.className = 'sb-reaction-pill dib flex items-center ph2 br-pill sb-pill pointer sans-serif mr1 mb1' 
+      pill.style.cssText = 'padding-top:2px;padding-bottom:2px;font-size:12px'
       pill.dataset.active = String(!!group.viewerHasReacted)
-      pill.innerHTML = `<span>${REACTION_EMOJI[group.content] ?? group.content}</span><span>${count}</span>`
+      if (group.viewerHasReacted) {
+        pill.className = 'sb-reaction-pill dib flex items-center ph2 br-pill sb-pill sb-pill-active pointer sans-serif mr1 mb1'
+        pill.style.cssText = 'padding-top:2px;padding-bottom:2px;font-size:12px'
+      }
+      pill.innerHTML = `<span class="mr1">${REACTION_EMOJI[group.content] ?? group.content}</span><span>${count}</span>`
       pill.addEventListener('click', (e) => {
         e.stopPropagation()
         toggleReaction(item, group.content, group, render)
@@ -403,7 +63,8 @@ function buildReactionBar(item) {
 
     // Add reaction button
     const addBtn = document.createElement('button')
-    addBtn.className = 'sb-reaction-add-btn'
+    addBtn.className = 'dib flex items-center ph1 br-pill ba sb-b-default sb-bg-muted sb-fg-muted f7 pointer sans-serif relative mr1 mb1'
+    addBtn.style.cssText = 'padding-top:2px;padding-bottom:2px'
     addBtn.textContent = '😀 +'
     addBtn.addEventListener('click', (e) => {
       e.stopPropagation()
@@ -417,19 +78,24 @@ function buildReactionBar(item) {
 }
 
 function showPicker(anchorBtn, item, rerenderBar) {
-  // Remove any existing picker
   const existing = anchorBtn.querySelector('.sb-reaction-picker')
   if (existing) { existing.remove(); return }
 
   const picker = document.createElement('div')
-  picker.className = 'sb-reaction-picker'
+  picker.className = 'sb-reaction-picker absolute left-0 flex pa1 sb-bg ba sb-b-default br3 sb-shadow'
+  picker.style.cssText = 'bottom:100%;margin-bottom:4px;z-index:10'
 
   for (const [content, emoji] of Object.entries(REACTION_EMOJI)) {
     const groups = item.reactionGroups ?? []
     const reacted = groups.some(r => r.content === content && r.viewerHasReacted)
 
     const btn = document.createElement('button')
-    btn.className = 'sb-reaction-picker-btn'
+    btn.className = reacted
+      ? 'flex items-center justify-center br2 bn f6 pointer mr1'
+      : 'flex items-center justify-center br2 bn bg-transparent f6 pointer mr1'
+    btn.style.cssText = reacted
+      ? 'width:28px;height:28px;background:color-mix(in srgb, var(--sb-fg-accent) 10%, transparent);box-shadow:inset 0 0 0 1px var(--sb-fg-accent);transition:background 100ms'
+      : 'width:28px;height:28px;transition:background 100ms'
     btn.dataset.active = String(reacted)
     btn.textContent = emoji
     btn.addEventListener('click', (e) => {
@@ -443,7 +109,6 @@ function showPicker(anchorBtn, item, rerenderBar) {
 
   anchorBtn.appendChild(picker)
 
-  // Close picker on next click outside
   function onClickOutside(e) {
     if (!picker.contains(e.target) && e.target !== anchorBtn) {
       picker.remove()
@@ -456,7 +121,6 @@ function showPicker(anchorBtn, item, rerenderBar) {
 async function toggleReaction(item, content, existingGroup, rerenderBar) {
   const wasReacted = existingGroup?.viewerHasReacted ?? false
 
-  // Optimistic update
   if (!item.reactionGroups) item.reactionGroups = []
 
   if (wasReacted && existingGroup) {
@@ -503,8 +167,6 @@ let activeWindow = null
  * @returns {{ el: HTMLElement, destroy: () => void }}
  */
 export function showCommentWindow(container, comment, discussion, callbacks = {}) {
-  injectStyles()
-
   // Close any existing window
   if (activeWindow) {
     activeWindow.destroy()
@@ -513,34 +175,42 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
 
   const user = getCachedUser()
   const win = document.createElement('div')
-  win.className = 'sb-comment-window'
+  win.className = 'sb-comment-window absolute flex flex-column sb-bg ba sb-b-default br3 sb-shadow sans-serif overflow-hidden'
+  win.style.zIndex = '100001'
+  win.style.width = '360px'
+  win.style.maxHeight = '480px'
   win.style.left = `${comment.meta?.x ?? 0}%`
   win.style.top = `${comment.meta?.y ?? 0}%`
   win.style.transform = 'translate(12px, -50%)'
 
   // --- Header (draggable) ---
   const header = document.createElement('div')
-  header.className = 'sb-comment-window-header'
+  header.className = 'flex items-center justify-between ph3 pv2 bb sb-b-muted'
+  header.style.cssText = 'cursor:grab;user-select:none'
+  header.addEventListener('mousedown', () => { header.style.cursor = 'grabbing' })
+  header.addEventListener('mouseup', () => { header.style.cursor = 'grab' })
 
   const headerLeft = document.createElement('div')
-  headerLeft.className = 'sb-comment-window-header-left'
+  headerLeft.className = 'flex items-center'
 
   if (comment.author?.avatarUrl) {
     const avatar = document.createElement('img')
-    avatar.className = 'sb-comment-window-avatar'
+    avatar.className = 'br-100 ba sb-b-default flex-shrink-0 mr2'
+    avatar.style.cssText = 'width:24px;height:24px'
     avatar.src = comment.author.avatarUrl
     avatar.alt = comment.author.login ?? ''
     headerLeft.appendChild(avatar)
   }
 
   const authorSpan = document.createElement('span')
-  authorSpan.className = 'sb-comment-window-author'
+  authorSpan.className = 'f7 fw6 sb-fg'
   authorSpan.textContent = comment.author?.login ?? 'unknown'
   headerLeft.appendChild(authorSpan)
 
   if (comment.createdAt) {
     const timeSpan = document.createElement('span')
-    timeSpan.className = 'sb-comment-window-time'
+    timeSpan.className = 'sb-fg-muted ml1'
+    timeSpan.style.fontSize = '11px'
     timeSpan.textContent = timeAgo(comment.createdAt)
     headerLeft.appendChild(timeSpan)
   }
@@ -548,37 +218,54 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
   header.appendChild(headerLeft)
 
   const headerActions = document.createElement('div')
-  headerActions.className = 'sb-comment-window-header-actions'
+  headerActions.className = 'sb-comment-window-header-actions flex items-center flex-shrink-0'
 
-  // Resolve button
+  const ACTION_BTN = 'flex items-center justify-center pa2 bg-transparent bn br2 pointer fw5 sans-serif flex-shrink-0 nowrap'
+  const ACTION_BTN_STYLE = 'font-size:11px;line-height:1'
+  const ACTION_BTN_DEFAULT = `${ACTION_BTN} sb-fg-muted`
+  const ACTION_BTN_SUCCESS = `${ACTION_BTN} sb-fg-success`
+
+  // Resolve/Unresolve button
   const resolveBtn = document.createElement('button')
-  resolveBtn.className = 'sb-comment-window-action-btn'
-  resolveBtn.setAttribute('aria-label', comment.meta?.resolved ? 'Resolved' : 'Resolve')
-  resolveBtn.title = comment.meta?.resolved ? 'Resolved' : 'Resolve'
-  resolveBtn.textContent = comment.meta?.resolved ? 'Resolved' : 'Resolve'
-  if (comment.meta?.resolved) resolveBtn.dataset.resolved = 'true'
+  resolveBtn.className = comment.meta?.resolved ? ACTION_BTN_SUCCESS : ACTION_BTN_DEFAULT
+  resolveBtn.style.cssText = ACTION_BTN_STYLE
+  resolveBtn.setAttribute('aria-label', comment.meta?.resolved ? 'Unresolve' : 'Resolve')
+  resolveBtn.title = comment.meta?.resolved ? 'Unresolve' : 'Resolve'
+  resolveBtn.textContent = comment.meta?.resolved ? 'Resolved ✓' : 'Resolve'
   resolveBtn.addEventListener('click', async (e) => {
     e.stopPropagation()
-    if (comment.meta?.resolved) return
-    resolveBtn.dataset.resolved = 'true'
-    resolveBtn.textContent = 'Resolved'
-    resolveBtn.title = 'Resolved'
+    const wasResolved = !!comment.meta?.resolved
+    resolveBtn.disabled = true
+    resolveBtn.textContent = wasResolved ? 'Unresolving…' : 'Resolving…'
     try {
-      await resolveComment(comment.id, comment._rawBody ?? comment.body ?? '')
-      comment.meta = { ...comment.meta, resolved: true }
-      callbacks.onMove?.()
+      if (wasResolved) {
+        await unresolveComment(comment.id, comment._rawBody ?? comment.body ?? '')
+        comment.meta = { ...comment.meta, resolved: false }
+        delete comment.meta.resolved
+        resolveBtn.className = ACTION_BTN_DEFAULT
+        resolveBtn.textContent = 'Resolve'
+        resolveBtn.title = 'Resolve'
+        resolveBtn.disabled = false
+        callbacks.onMove?.()
+      } else {
+        await resolveComment(comment.id, comment._rawBody ?? comment.body ?? '')
+        comment.meta = { ...comment.meta, resolved: true }
+        callbacks.onMove?.()
+        destroy()
+      }
     } catch (err) {
-      console.error('[storyboard] Failed to resolve comment:', err)
-      resolveBtn.dataset.resolved = 'false'
-      resolveBtn.textContent = 'Resolve'
-      resolveBtn.title = 'Resolve'
+      console.error('[storyboard] Failed to toggle resolve:', err)
+      resolveBtn.className = wasResolved ? ACTION_BTN_SUCCESS : ACTION_BTN_DEFAULT
+      resolveBtn.textContent = wasResolved ? 'Resolved ✓' : 'Resolve'
+      resolveBtn.disabled = false
     }
   })
   headerActions.appendChild(resolveBtn)
 
   // Share button
   const shareBtn = document.createElement('button')
-  shareBtn.className = 'sb-comment-window-action-btn'
+  shareBtn.className = ACTION_BTN_DEFAULT
+  shareBtn.style.cssText = ACTION_BTN_STYLE
   shareBtn.setAttribute('aria-label', 'Copy link')
   shareBtn.title = 'Copy link'
   shareBtn.textContent = 'Copy link'
@@ -588,15 +275,16 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
     url.searchParams.set('comment', comment.id)
     navigator.clipboard.writeText(url.toString()).then(() => {
       shareBtn.dataset.copied = 'true'
+      shareBtn.className = ACTION_BTN_SUCCESS
       shareBtn.textContent = 'Copied!'
       shareBtn.title = 'Copied!'
       setTimeout(() => {
         shareBtn.dataset.copied = 'false'
+        shareBtn.className = ACTION_BTN_DEFAULT
         shareBtn.textContent = 'Copy link'
         shareBtn.title = 'Copy link'
       }, 2000)
     }).catch(() => {
-      // Fallback: select text in a temp input
       const input = document.createElement('input')
       input.value = url.toString()
       document.body.appendChild(input)
@@ -609,7 +297,8 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
 
   // Close button
   const closeBtn = document.createElement('button')
-  closeBtn.className = 'sb-comment-window-close'
+  closeBtn.className = 'flex items-center justify-center bg-transparent bn br2 sb-fg-muted pointer flex-shrink-0'
+  closeBtn.style.cssText = 'width:24px;height:24px;font-size:16px;line-height:1'
   closeBtn.innerHTML = '×'
   closeBtn.setAttribute('aria-label', 'Close')
   closeBtn.addEventListener('click', (e) => {
@@ -623,12 +312,76 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
 
   // --- Body ---
   const body = document.createElement('div')
-  body.className = 'sb-comment-window-body'
+  body.className = 'flex-auto overflow-y-auto pa3'
 
   const textP = document.createElement('p')
-  textP.className = 'sb-comment-window-text'
+  textP.className = 'lh-copy sb-fg ma0 mb2 word-wrap'
+  textP.style.fontSize = '13px'
   textP.textContent = comment.text ?? ''
   body.appendChild(textP)
+
+  // Edit button for top-level comment (only for author)
+  if (user && comment.author?.login === user.login) {
+    const editBtn = document.createElement('button')
+    editBtn.className = 'sb-fg-muted bg-transparent bn pointer f7 mb2 underline-hover'
+    editBtn.textContent = 'Edit'
+    editBtn.addEventListener('click', (e) => {
+      e.stopPropagation()
+      editBtn.style.display = 'none'
+      textP.style.display = 'none'
+
+      const editArea = document.createElement('textarea')
+      editArea.className = 'sb-input w-100 ph2 pv1 br2 f7 sans-serif lh-copy db mb1'
+      editArea.style.cssText = 'min-height:60px;max-height:160px;resize:vertical;box-sizing:border-box'
+      editArea.value = comment.text ?? ''
+      body.insertBefore(editArea, textP.nextSibling)
+
+      const editActions = document.createElement('div')
+      editActions.className = 'flex justify-end mb2'
+      const cancelEdit = document.createElement('button')
+      cancelEdit.className = 'sb-btn-cancel ph2 pv1 br2 f7 fw5 sans-serif pointer mr1'
+      cancelEdit.textContent = 'Cancel'
+      const saveEdit = document.createElement('button')
+      saveEdit.className = 'sb-btn-success ph2 pv1 br2 f7 fw5 sans-serif pointer bn'
+      saveEdit.textContent = 'Save'
+      editActions.appendChild(cancelEdit)
+      editActions.appendChild(saveEdit)
+      body.insertBefore(editActions, editArea.nextSibling)
+
+      cancelEdit.addEventListener('click', (ev) => {
+        ev.stopPropagation()
+        editArea.remove()
+        editActions.remove()
+        textP.style.display = ''
+        editBtn.style.display = ''
+      })
+
+      saveEdit.addEventListener('click', async (ev) => {
+        ev.stopPropagation()
+        const newText = editArea.value.trim()
+        if (!newText) return
+        saveEdit.disabled = true
+        saveEdit.textContent = 'Saving…'
+        try {
+          await editComment(comment.id, comment._rawBody ?? comment.body ?? '', newText)
+          comment.text = newText
+          comment._rawBody = null
+          textP.textContent = newText
+          editArea.remove()
+          editActions.remove()
+          textP.style.display = ''
+          editBtn.style.display = ''
+        } catch (err) {
+          console.error('[storyboard] Failed to edit comment:', err)
+          saveEdit.disabled = false
+          saveEdit.textContent = 'Save'
+        }
+      })
+
+      editArea.focus()
+    })
+    body.appendChild(editBtn)
+  }
 
   // Reactions for the main comment
   body.appendChild(buildReactionBar(comment))
@@ -637,39 +390,43 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
   const replies = comment.replies ?? []
   if (replies.length > 0) {
     const repliesSection = document.createElement('div')
-    repliesSection.className = 'sb-comment-window-replies'
+    repliesSection.className = 'bt sb-b-muted pt2 mt1'
 
     const repliesLabel = document.createElement('div')
-    repliesLabel.className = 'sb-comment-window-replies-label'
+    repliesLabel.className = 'fw6 sb-fg-muted ttu tracked mb2'
+    repliesLabel.style.fontSize = '11px'
     repliesLabel.textContent = `${replies.length} ${replies.length === 1 ? 'Reply' : 'Replies'}`
     repliesSection.appendChild(repliesLabel)
 
     for (const reply of replies) {
       const replyEl = document.createElement('div')
-      replyEl.className = 'sb-reply-item'
+      replyEl.className = 'flex mb2'
 
       if (reply.author?.avatarUrl) {
         const avatar = document.createElement('img')
-        avatar.className = 'sb-reply-avatar'
+        avatar.className = 'br-100 ba sb-b-default flex-shrink-0 mr2'
+        avatar.style.cssText = 'width:20px;height:20px'
         avatar.src = reply.author.avatarUrl
         avatar.alt = reply.author.login ?? ''
         replyEl.appendChild(avatar)
       }
 
       const content = document.createElement('div')
-      content.className = 'sb-reply-content'
+      content.className = 'flex-auto'
+      content.style.minWidth = '0'
 
       const meta = document.createElement('div')
-      meta.className = 'sb-reply-meta'
+      meta.className = 'flex items-center mb1'
 
       const authorEl = document.createElement('span')
-      authorEl.className = 'sb-reply-author'
+      authorEl.className = 'f7 fw6 sb-fg mr1'
       authorEl.textContent = reply.author?.login ?? 'unknown'
       meta.appendChild(authorEl)
 
       if (reply.createdAt) {
         const timeEl = document.createElement('span')
-        timeEl.className = 'sb-reply-time'
+        timeEl.className = 'sb-fg-muted'
+        timeEl.style.fontSize = '11px'
         timeEl.textContent = timeAgo(reply.createdAt)
         meta.appendChild(timeEl)
       }
@@ -677,9 +434,104 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
       content.appendChild(meta)
 
       const replyText = document.createElement('p')
-      replyText.className = 'sb-reply-text'
+      replyText.className = 'lh-copy sb-fg ma0 word-wrap'
+      replyText.style.fontSize = '13px'
       replyText.textContent = reply.text ?? reply.body ?? ''
       content.appendChild(replyText)
+
+      // Edit/Delete buttons for reply (only for author)
+      if (user && reply.author?.login === user.login) {
+        const replyActions = document.createElement('div')
+        replyActions.className = 'flex mt1'
+        replyActions.style.gap = '8px'
+
+        const editReplyBtn = document.createElement('button')
+        editReplyBtn.className = 'sb-fg-muted bg-transparent bn pointer underline-hover'
+        editReplyBtn.style.fontSize = '11px'
+        editReplyBtn.textContent = 'Edit'
+        editReplyBtn.addEventListener('click', (ev) => {
+          ev.stopPropagation()
+          editReplyBtn.style.display = 'none'
+          replyText.style.display = 'none'
+          if (replyActions.querySelector('.sb-delete-reply')) replyActions.querySelector('.sb-delete-reply').style.display = 'none'
+
+          const editArea = document.createElement('textarea')
+          editArea.className = 'sb-input w-100 ph2 pv1 br2 sans-serif lh-copy db mb1'
+          editArea.style.cssText = 'min-height:40px;max-height:100px;resize:vertical;box-sizing:border-box;font-size:12px'
+          editArea.value = reply.text ?? reply.body ?? ''
+          content.insertBefore(editArea, replyText.nextSibling)
+
+          const editBtns = document.createElement('div')
+          editBtns.className = 'flex justify-end mb1'
+          const cancelBtn = document.createElement('button')
+          cancelBtn.className = 'sb-btn-cancel ph2 pv1 br2 f7 fw5 sans-serif pointer mr1'
+          cancelBtn.textContent = 'Cancel'
+          const saveBtn = document.createElement('button')
+          saveBtn.className = 'sb-btn-success ph2 pv1 br2 f7 fw5 sans-serif pointer bn'
+          saveBtn.textContent = 'Save'
+          editBtns.appendChild(cancelBtn)
+          editBtns.appendChild(saveBtn)
+          content.insertBefore(editBtns, editArea.nextSibling)
+
+          cancelBtn.addEventListener('click', (ev2) => {
+            ev2.stopPropagation()
+            editArea.remove()
+            editBtns.remove()
+            replyText.style.display = ''
+            editReplyBtn.style.display = ''
+            if (replyActions.querySelector('.sb-delete-reply')) replyActions.querySelector('.sb-delete-reply').style.display = ''
+          })
+
+          saveBtn.addEventListener('click', async (ev2) => {
+            ev2.stopPropagation()
+            const newText = editArea.value.trim()
+            if (!newText) return
+            saveBtn.disabled = true
+            saveBtn.textContent = 'Saving…'
+            try {
+              await editReply(reply.id, newText)
+              reply.text = newText
+              reply.body = newText
+              replyText.textContent = newText
+              editArea.remove()
+              editBtns.remove()
+              replyText.style.display = ''
+              editReplyBtn.style.display = ''
+              if (replyActions.querySelector('.sb-delete-reply')) replyActions.querySelector('.sb-delete-reply').style.display = ''
+            } catch (err) {
+              console.error('[storyboard] Failed to edit reply:', err)
+              saveBtn.disabled = false
+              saveBtn.textContent = 'Save'
+            }
+          })
+
+          editArea.focus()
+        })
+        replyActions.appendChild(editReplyBtn)
+
+        const deleteReplyBtn = document.createElement('button')
+        deleteReplyBtn.className = 'sb-delete-reply sb-fg-danger bg-transparent bn pointer underline-hover'
+        deleteReplyBtn.style.fontSize = '11px'
+        deleteReplyBtn.textContent = 'Delete'
+        deleteReplyBtn.addEventListener('click', async (ev) => {
+          ev.stopPropagation()
+          if (!confirm('Delete this reply?')) return
+          deleteReplyBtn.textContent = 'Deleting…'
+          deleteReplyBtn.disabled = true
+          try {
+            await deleteComment(reply.id)
+            replyEl.remove()
+            callbacks.onMove?.()
+          } catch (err) {
+            console.error('[storyboard] Failed to delete reply:', err)
+            deleteReplyBtn.textContent = 'Delete'
+            deleteReplyBtn.disabled = false
+          }
+        })
+        replyActions.appendChild(deleteReplyBtn)
+
+        content.appendChild(replyActions)
+      }
 
       // Reply reactions
       content.appendChild(buildReactionBar(reply))
@@ -696,18 +548,19 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
   // --- Reply form ---
   if (user && discussion) {
     const form = document.createElement('div')
-    form.className = 'sb-comment-window-reply-form'
+    form.className = 'bt sb-b-muted ph3 pv3 flex flex-column'
 
     const textarea = document.createElement('textarea')
-    textarea.className = 'sb-reply-textarea'
+    textarea.className = 'sb-input w-100 ph2 pv1 br2 f7 sans-serif lh-copy db mb1'
+    textarea.style.cssText = 'min-height:40px;max-height:100px;resize:vertical;box-sizing:border-box'
     textarea.placeholder = 'Reply…'
     form.appendChild(textarea)
 
     const actions = document.createElement('div')
-    actions.className = 'sb-reply-form-actions'
+    actions.className = 'flex justify-end mt2'
 
     const submitBtn = document.createElement('button')
-    submitBtn.className = 'sb-reply-submit-btn'
+    submitBtn.className = 'sb-btn-success ph2 pv1 br2 f7 fw5 sans-serif pointer bn'
     submitBtn.textContent = 'Reply'
     submitBtn.disabled = true
 
@@ -726,7 +579,6 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
         await replyToComment(discussion.id, comment.id, text)
         textarea.value = ''
         submitBtn.textContent = 'Reply'
-        // Refresh the window with new data
         callbacks.onMove?.()
       } catch (err) {
         console.error('[storyboard] Failed to post reply:', err)
@@ -761,14 +613,12 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
   let winStartTop = 0
 
   function onMouseDown(e) {
-    // Only drag from header, not action buttons
     if (e.target.closest('.sb-comment-window-header-actions')) return
     isDragging = true
     dragStartX = e.clientX
     dragStartY = e.clientY
 
     const containerRect = container.getBoundingClientRect()
-    // Parse current position from percentage
     winStartLeft = (parseFloat(win.style.left) / 100) * containerRect.width
     winStartTop = (parseFloat(win.style.top) / 100) * containerRect.height
 
@@ -799,7 +649,6 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
     document.removeEventListener('mousemove', onMouseMove)
     document.removeEventListener('mouseup', onMouseUp)
 
-    // Calculate final position percentage
     const containerRect = container.getBoundingClientRect()
     const dx = e.clientX - dragStartX
     const dy = e.clientY - dragStartY
@@ -808,12 +657,9 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
     const xPct = Math.round((newLeft / containerRect.width) * 1000) / 10
     const yPct = Math.round((newTop / containerRect.height) * 1000) / 10
 
-    // Only update if actually moved
     if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
-      // Update the pin position
       comment.meta = { ...comment.meta, x: xPct, y: yPct }
 
-      // Move the corresponding pin element without re-rendering everything
       const pins = container.querySelectorAll('.sb-comment-pin')
       for (const pin of pins) {
         if (pin._commentId === comment.id) {
@@ -825,8 +671,7 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
 
       try {
         await moveComment(comment.id, comment._rawBody ?? '', xPct, yPct)
-        // Update raw body with new metadata for future moves
-        comment._rawBody = null // force re-fetch on next move
+        comment._rawBody = null
       } catch (err) {
         console.error('[storyboard] Failed to move comment:', err)
       }
@@ -845,12 +690,42 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
 
   container.appendChild(win)
 
+  // Adjust position to keep window within viewport
+  requestAnimationFrame(() => {
+    const rect = win.getBoundingClientRect()
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const pad = 8
+
+    let tx = 12
+    let ty = -(rect.height / 2)
+
+    // Flip left if it would overflow right edge
+    const rightEdge = rect.left + rect.width
+    if (rightEdge > vw - pad) {
+      tx = -(rect.width + 12)
+    }
+
+    // Clamp vertically: compute final top/bottom in viewport coords
+    const anchorY = rect.top + rect.height / 2 // center of the initial rect (transform was 12px, -50%)
+    const finalTop = anchorY + ty
+    const finalBottom = finalTop + rect.height
+
+    if (finalBottom > vh - pad) {
+      ty -= (finalBottom - vh + pad)
+    }
+    if (anchorY + ty < pad) {
+      ty = pad - anchorY
+    }
+
+    win.style.transform = `translate(${tx}px, ${ty}px)`
+  })
+
   function destroy() {
     document.removeEventListener('mousemove', onMouseMove)
     document.removeEventListener('mouseup', onMouseUp)
     win.remove()
     if (activeWindow?.el === win) activeWindow = null
-    // Clear URL param
     const currentUrl = new URL(window.location.href)
     currentUrl.searchParams.delete('comment')
     window.history.replaceState(null, '', currentUrl.toString())
