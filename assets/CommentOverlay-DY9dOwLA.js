@@ -1,4 +1,4 @@
-import{i as C,l as $,f as N,s as M,o as S,t as z,a as D}from"./index-B16q-90B.js";import"./vendor-primer-BK6UB-si.js";import"./vendor-react-BQyrhFMj.js";import"./vendor-octicons-BtAiKi0j.js";import"./vendor-reshaped-BDP14DwY.js";const v="sb-comments-drawer-style";function A(){if(document.getElementById(v))return;const e=document.createElement("style");e.id=v,e.textContent=`
+import{i as C,l as $,f as N,s as M,o as S,t as z,a as D}from"./index-_WsJ2gIZ.js";import"./vendor-primer-BK6UB-si.js";import"./vendor-react-BQyrhFMj.js";import"./vendor-octicons-BtAiKi0j.js";import"./vendor-reshaped-BDP14DwY.js";const v="sb-comments-drawer-style";function A(){if(document.getElementById(v))return;const e=document.createElement("style");e.id=v,e.textContent=`
     .sb-comments-drawer-backdrop {
       position: fixed;
       inset: 0;
