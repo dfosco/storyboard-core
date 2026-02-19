@@ -9,8 +9,8 @@ import Alpine from 'alpinejs'
 import { isCommentsEnabled } from '../config.js'
 import { isAuthenticated } from '../auth.js'
 import { toggleCommentMode, setCommentMode, isCommentModeActive, subscribeToCommentMode } from '../commentMode.js'
-import { fetchRouteCommentsSummary, fetchCommentDetail } from '../api.js'
-import { getCachedComments, setCachedComments } from '../commentCache.js'
+import { fetchRouteCommentsSummary, fetchCommentDetail, moveComment } from '../api.js'
+import { getCachedComments, setCachedComments, clearCachedComments } from '../commentCache.js'
 import { showComposer } from './composer.js'
 import { openAuthModal } from './authModal.js'
 import { showCommentWindow, closeCommentWindow } from './commentWindow.js'
@@ -71,6 +71,11 @@ function clearPins() {
   renderedPins = []
 }
 
+function reloadComments() {
+  clearCachedComments(getCurrentRoute())
+  loadAndRenderComments()
+}
+
 function renderPin(ov, comment, index) {
   const hue = Math.round((index * 137.5) % 360)
   const pin = document.createElement('div')
@@ -83,14 +88,65 @@ function renderPin(ov, comment, index) {
   pin.title = `${comment.author?.login ?? 'unknown'}: ${comment.text?.slice(0, 80) ?? ''}`
 
   pin.innerHTML = comment.author?.avatarUrl
-    ? `<img class="br-100 db sb-pin-img" src="${esc(comment.author.avatarUrl)}" alt="${esc(comment.author.login)}" />`
+    ? `<img class="br-100 db sb-pin-img" src="${esc(comment.author.avatarUrl)}" alt="${esc(comment.author.login)}" draggable="false" />`
     : ''
 
   pin._commentId = comment.id
   comment._rawBody = comment.body
 
+  let dragged = false
+
+  pin.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return
+    dragged = false
+    const container = getContentContainer()
+    const containerRect = container.getBoundingClientRect()
+    const startX = e.clientX
+    const startY = e.clientY
+    const startLeft = (parseFloat(pin.style.left) / 100) * containerRect.width
+    const startTop = (parseFloat(pin.style.top) / 100) * containerRect.height
+
+    const onMove = (ev) => {
+      const dx = ev.clientX - startX
+      const dy = ev.clientY - startY
+      if (!dragged && Math.abs(dx) < 4 && Math.abs(dy) < 4) return
+      dragged = true
+      const cr = container.getBoundingClientRect()
+      const xPct = Math.round(((startLeft + dx) / cr.width) * 1000) / 10
+      const yPct = Math.round(((startTop + dy) / cr.height) * 1000) / 10
+      pin.style.left = `${xPct}%`
+      pin.style.top = `${yPct}%`
+    }
+
+    const onUp = async (ev) => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+      if (!dragged) return
+
+      const cr = container.getBoundingClientRect()
+      const dx = ev.clientX - startX
+      const dy = ev.clientY - startY
+      const xPct = Math.round(((startLeft + dx) / cr.width) * 1000) / 10
+      const yPct = Math.round(((startTop + dy) / cr.height) * 1000) / 10
+      comment.meta = { ...comment.meta, x: xPct, y: yPct }
+
+      try {
+        await moveComment(comment.id, comment._rawBody ?? comment.body ?? '', xPct, yPct)
+        comment._rawBody = null
+        clearCachedComments(getCurrentRoute())
+      } catch (err) {
+        console.error('[storyboard] Failed to move pin:', err)
+      }
+    }
+
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+    e.preventDefault()
+  })
+
   pin.addEventListener('click', async (e) => {
     e.stopPropagation()
+    if (dragged) return
     if (activeComposer) {
       activeComposer.destroy()
       activeComposer = null
@@ -102,7 +158,7 @@ function renderPin(ov, comment, index) {
         detail._rawBody = detail.body
         showCommentWindow(ov, detail, cachedDiscussion, {
           onClose: () => {},
-          onMove: () => loadAndRenderComments(),
+          onMove: () => reloadComments(),
         })
       }
     } catch (err) {
@@ -110,7 +166,7 @@ function renderPin(ov, comment, index) {
       // Fall back to summary data
       showCommentWindow(ov, comment, cachedDiscussion, {
         onClose: () => {},
-        onMove: () => loadAndRenderComments(),
+        onMove: () => reloadComments(),
       })
     }
   })
@@ -191,7 +247,7 @@ async function autoOpenCommentFromUrl(ov, discussion) {
       detail._rawBody = detail.body
       showCommentWindow(ov, detail, discussion, {
         onClose: () => {},
-        onMove: () => loadAndRenderComments(),
+        onMove: () => reloadComments(),
       })
       return
     }
@@ -203,7 +259,7 @@ async function autoOpenCommentFromUrl(ov, discussion) {
   comment._rawBody = comment.body
   showCommentWindow(ov, comment, discussion, {
     onClose: () => {},
-    onMove: () => loadAndRenderComments(),
+    onMove: () => reloadComments(),
   })
 }
 
@@ -228,7 +284,7 @@ function handleOverlayClick(e) {
     onCancel: () => { activeComposer = null },
     onSubmit: () => {
       activeComposer = null
-      loadAndRenderComments()
+      reloadComments()
     },
   })
 }

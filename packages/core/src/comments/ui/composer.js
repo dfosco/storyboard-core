@@ -35,7 +35,7 @@ export function showComposer(container, xPct, yPct, route, callbacks = {}) {
           <span class="f7 sb-fg-muted fw5">${user.login}</span>
         </div>
       ` : ''}
-      <div class="ph3 pt2 pb3">
+      <div class="ph3 pt3">
         <textarea class="sb-input sb-textarea w-100 ph2 pv2 br2 f6 sans-serif lh-copy db sb-f-sm"
                   placeholder="Leave a comment…"
                   x-model="text"
@@ -45,9 +45,9 @@ export function showComposer(container, xPct, yPct, route, callbacks = {}) {
       <template x-if="error">
         <div class="ph3 pb2 f7 sb-fg-danger" x-text="error"></div>
       </template>
-      <div class="flex items-center justify-end ph3 pb2">
-        <button class="sb-btn-cancel ph3 pv1 br2 f7 fw5 pointer mr1" @click="cancel()">Cancel</button>
-        <button class="sb-btn-success ph3 pv1 br2 f7 fw5 pointer bn" :disabled="submitting"
+      <div class="flex items-center justify-end pa3">
+        <button class="sb-btn-cancel ph3 pv2 br2 f7 fw5 pointer mr1" @click="cancel()">Cancel</button>
+        <button class="sb-btn-success ph3 pv2 br2 f7 fw5 pointer bn" :disabled="submitting"
                 @click="submit()" x-text="submitting ? 'Posting…' : 'Comment'">Comment</button>
       </div>
     </div>

@@ -63,7 +63,7 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
 
   win.innerHTML = `
       <!-- Header (draggable) -->
-      <div class="flex items-center justify-between ph3 pt3 pb2 bb sb-b-muted sb-draggable"
+      <div class="flex items-center justify-between ph3 pv3 bb sb-b-muted sb-draggable"
            @mousedown="startDrag($event)">
         <div class="flex items-center">
           ${comment.author?.avatarUrl ? `<img class="br-100 ba sb-b-default flex-shrink-0 mr2 sb-avatar" src="${esc(comment.author.avatarUrl)}" alt="${esc(comment.author.login)}" />` : ''}
@@ -92,7 +92,7 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
       </div>
 
       <!-- Body -->
-      <div class="flex-auto overflow-y-auto pa3">
+      <div class="flex-auto overflow-y-auto ph3 pt3">
         <!-- Comment text / edit -->
         <template x-if="!editing">
           <div>
@@ -105,7 +105,7 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
                       x-model="editText" x-ref="editArea" x-init="$nextTick(() => $refs.editArea?.focus())"></textarea>
             <div class="flex justify-end mb2">
               <button class="sb-btn-cancel ph2 pv1 br2 f7 fw5 sans-serif pointer mr1" @click="editing = false">Cancel</button>
-              <button class="sb-btn-success ph2 pv1 br2 f7 fw5 sans-serif pointer bn"
+              <button class="sb-btn-success ph3 pv2 br2 f7 fw5 sans-serif pointer bn"
                       :disabled="saving" @click="saveEdit()"
                       x-text="saving ? 'Saving…' : 'Save'">Save</button>
             </div>
@@ -166,7 +166,7 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
                             x-model="editReplyText"></textarea>
                   <div class="flex justify-end mb1">
                     <button class="sb-btn-cancel ph2 pv1 br2 f7 fw5 sans-serif pointer mr1" @click="editingReply = -1">Cancel</button>
-                    <button class="sb-btn-success ph2 pv1 br2 f7 fw5 sans-serif pointer bn"
+                    <button class="sb-btn-success ph3 pv2 br2 f7 fw5 sans-serif pointer bn"
                             :disabled="savingReply" @click="saveReply(${ri})"
                             x-text="savingReply ? 'Saving…' : 'Save'">Save</button>
                   </div>
@@ -226,7 +226,7 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
                   @keydown.ctrl.enter="submitReply()"
                   @keydown.escape.prevent.stop></textarea>
         <div class="flex justify-end mt2">
-          <button class="sb-btn-success ph2 pv1 br2 f7 fw5 sans-serif pointer bn"
+          <button class="sb-btn-success ph3 pv2 br2 f7 fw5 sans-serif pointer bn"
                   :disabled="!replyText.trim() || submittingReply"
                   @click="submitReply()"
                   x-text="submittingReply ? 'Posting…' : 'Reply'">Reply</button>
