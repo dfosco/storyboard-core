@@ -19,10 +19,11 @@ export function initCommentsConfig(rawConfig, options = {}) {
     return
   }
   const c = rawConfig.comments
+  const r = rawConfig.repository
   _config = {
     repo: {
-      owner: c.repo?.owner ?? '',
-      name: c.repo?.name ?? '',
+      owner: r?.owner ?? '',
+      name: r?.name ?? '',
     },
     discussions: {
       category: c.discussions?.category ?? 'Storyboard Comments',
