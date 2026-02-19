@@ -75,7 +75,7 @@
   cursor: pointer;
   transition: border-color 100ms, background 100ms;
 }
-.sb-pill:hover { border-color: var(--sb-fg-muted); }
+.sb-pill:hover { border-color: var(--sb-fg-accent); }
 .sb-pill-active {
   border-color: color-mix(in srgb, var(--sb-fg-accent) 40%, transparent);
   background: color-mix(in srgb, var(--sb-fg-accent) 10%, transparent);
@@ -136,7 +136,7 @@
 .sb-auth-modal      { width: 420px; max-width: calc(100vw - 32px); }
 
 /* Reaction pill sizing */
-.sb-pill-size { padding-top: 2px; padding-bottom: 2px; font-size: 12px; }
+/* .sb-pill-size { padding-top: 2px; padding-bottom: 2px; font-size: 12px; } */
 
 /* Reaction picker */
 .sb-reaction-picker { bottom: 100%; margin-bottom: 4px; z-index: 10; }

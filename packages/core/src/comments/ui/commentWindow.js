@@ -116,17 +116,17 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
         <div class="flex items-center flex-wrap mb2" x-ref="reactionBar">
           <template x-for="(group, gi) in reactions" :key="group.content">
             <template x-if="(group.users?.totalCount ?? 0) > 0">
-              <button class="sb-reaction-pill dib flex items-center ph2 br-pill pointer sans-serif mr1 mb1 sb-pill-size"
+              <button class="f7 flex items-center ph2 br-pill pointer sans-serif mr1 mb1 pv1 hover:b--blue"
                       :class="group.viewerHasReacted ? 'sb-pill sb-pill-active' : 'sb-pill'"
                       @click.stop="toggleReaction(group.content, gi)">
-                <span class="mr1" x-text="emojiFor(group.content)"></span>
-                <span x-text="group.users?.totalCount ?? 0"></span>
+                <span class="mr1 f7" x-text="emojiFor(group.content)"></span>
+                <span class="f7" x-text="group.users?.totalCount ?? 0"></span>
               </button>
             </template>
           </template>
-          <div class="relative mr1 mb1 flex flex-row justify-between w-100 align-center">
-            <button class="dib flex items-center ph1 br-pill ba sb-b-default sb-bg-muted sb-fg-muted f7 pointer sans-serif sb-pill-size"
-                    @click.stop="pickerTarget = pickerTarget === 'comment' ? null : 'comment'">😀 +</button>
+          <div class="relative mr1 mb1 dib">
+            <button class="dib flex items-center ph2 pv1 br-pill ba sb-b-default sb-bg-muted hover:b--black-60 sb-fg-muted f7 pointer sans-serif"
+                    @click.stop="pickerTarget = pickerTarget === 'comment' ? null : 'comment'"><span style="padding: 2px 0">😀 +</span></button>
             <template x-if="pickerTarget === 'comment'">
               <div class="sb-reaction-picker absolute left-0 flex pa1 sb-bg ba sb-b-default br3 sb-shadow" @click.outside="pickerTarget = null">
                 <template x-for="[key, emoji] in emojiEntries" :key="key">
@@ -137,10 +137,12 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
                 </template>
               </div>
             </template>
-            <template x-if="!editing">
-            ${canEdit ? `<button class="sb-fg-muted bg-transparent bn pointer f7 underline-hover" @click="editing = true; editText = commentText">Edit</button>` : ''}
-            </template>
           </div>
+          <template x-if="!editing">
+            <div class="dib mb1 ml-auto">
+            ${canEdit ? `<button class="sb-fg-muted bg-transparent bn pointer f7 underline-hover" @click="editing = true; editText = commentText">Edit</button>` : ''}
+            </div>
+          </template>
         </div>
 
         <!-- Replies -->
@@ -184,7 +186,7 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
               <div class="flex items-center flex-wrap mt1">
                 <template x-for="(rg, rgi) in replyReactions[${ri}]" :key="rg.content">
                   <template x-if="(rg.users?.totalCount ?? 0) > 0">
-                    <button class="sb-reaction-pill dib flex items-center ph2 br-pill pointer sans-serif mr1 mb1 sb-pill-size"
+                    <button class="dib flex f7 items-center ph2 br-pill pointer sans-serif mr1 mb1 "
                             :class="rg.viewerHasReacted ? 'sb-pill sb-pill-active' : 'sb-pill'"
                             @click.stop="toggleReplyReaction(${ri}, rg.content, rgi)">
                       <span class="mr1" x-text="emojiFor(rg.content)"></span>
@@ -193,7 +195,7 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
                   </template>
                 </template>
                 <div class="relative mr1 mb1">
-                  <button class="dib flex items-center ph1 br-pill ba sb-b-default sb-bg-muted sb-fg-muted f7 pointer sans-serif sb-pill-size"
+                  <button class="dib flex items-center ph2 pv1 br-pill ba sb-b-default sb-bg-muted hover:b--black-60 sb-fg-muted f7 pointer sans-serif "
                           @click.stop="pickerTarget = pickerTarget === 'reply-${ri}' ? null : 'reply-${ri}'">😀 +</button>
                   <template x-if="pickerTarget === 'reply-${ri}'">
                     <div class="sb-reaction-picker absolute left-0 flex pa1 sb-bg ba sb-b-default br3 sb-shadow" @click.outside="pickerTarget = null">
