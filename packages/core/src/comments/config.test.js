@@ -8,8 +8,8 @@ describe('initCommentsConfig', () => {
 
   it('initializes config from valid rawConfig', () => {
     initCommentsConfig({
+      repository: { owner: 'dfosco', name: 'storyboard' },
       comments: {
-        repo: { owner: 'dfosco', name: 'storyboard' },
         discussions: { category: 'Comments' },
       },
     })
@@ -23,9 +23,8 @@ describe('initCommentsConfig', () => {
 
   it('uses default category when not provided', () => {
     initCommentsConfig({
-      comments: {
-        repo: { owner: 'owner', name: 'repo' },
-      },
+      repository: { owner: 'owner', name: 'repo' },
+      comments: {},
     })
     const config = getCommentsConfig()
     expect(config.discussions.category).toBe('Storyboard Comments')
@@ -41,7 +40,7 @@ describe('initCommentsConfig', () => {
     expect(getCommentsConfig()).toBeNull()
   })
 
-  it('handles missing repo fields gracefully', () => {
+  it('handles missing repository fields gracefully', () => {
     initCommentsConfig({ comments: {} })
     const config = getCommentsConfig()
     expect(config.repo.owner).toBe('')
@@ -59,18 +58,19 @@ describe('isCommentsEnabled', () => {
   })
 
   it('returns false when owner is empty', () => {
-    initCommentsConfig({ comments: { repo: { owner: '', name: 'repo' } } })
+    initCommentsConfig({ repository: { owner: '', name: 'repo' }, comments: {} })
     expect(isCommentsEnabled()).toBe(false)
   })
 
   it('returns false when name is empty', () => {
-    initCommentsConfig({ comments: { repo: { owner: 'owner', name: '' } } })
+    initCommentsConfig({ repository: { owner: 'owner', name: '' }, comments: {} })
     expect(isCommentsEnabled()).toBe(false)
   })
 
   it('returns true when both owner and name are set', () => {
     initCommentsConfig({
-      comments: { repo: { owner: 'dfosco', name: 'storyboard' } },
+      repository: { owner: 'dfosco', name: 'storyboard' },
+      comments: {},
     })
     expect(isCommentsEnabled()).toBe(true)
   })
