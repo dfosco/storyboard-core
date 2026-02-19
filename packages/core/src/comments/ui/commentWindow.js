@@ -6,7 +6,7 @@
  * Styled with Tachyons + sb-* custom classes for light/dark mode support.
  */
 
-import { replyToComment, addReaction, removeReaction, moveComment, resolveComment, unresolveComment, editComment, editReply, deleteComment } from '../api.js'
+import { replyToComment, addReaction, removeReaction, resolveComment, unresolveComment, editComment, editReply, deleteComment } from '../api.js'
 import { getCachedUser } from '../auth.js'
 
 const REACTION_EMOJI = {
@@ -467,56 +467,31 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
         }
       },
 
-      // Drag-to-move
+      // Drag-to-reposition window (temporary, view-only — does not move the pin)
       startDrag(e) {
         if (e.target.closest('.sb-comment-window-header-actions')) return
         const winEl = this._win
-        const containerEl = this._container
-        const comment = this._comment
-        const callbacks = this._callbacks
-
-        const containerRect = containerEl.getBoundingClientRect()
         const startX = e.clientX
         const startY = e.clientY
-        const winStartLeft = (parseFloat(winEl.style.left) / 100) * containerRect.width
-        const winStartTop = (parseFloat(winEl.style.top) / 100) * containerRect.height
+        const rect = winEl.getBoundingClientRect()
+        const startWinX = rect.left
+        const startWinY = rect.top
 
         e.target.style.cursor = 'grabbing'
 
         const onMove = (ev) => {
-          const cr = containerEl.getBoundingClientRect()
-          const xPct = Math.round(((winStartLeft + ev.clientX - startX) / cr.width) * 1000) / 10
-          const yPct = Math.round(((winStartTop + ev.clientY - startY) / cr.height) * 1000) / 10
-          winEl.style.left = `${xPct}%`
-          winEl.style.top = `${yPct}%`
+          const dx = ev.clientX - startX
+          const dy = ev.clientY - startY
+          winEl.style.position = 'fixed'
+          winEl.style.left = `${startWinX + dx}px`
+          winEl.style.top = `${startWinY + dy}px`
+          winEl.style.transform = 'none'
         }
 
-        const onUp = async (ev) => {
+        const onUp = () => {
           e.target.style.cursor = 'grab'
           document.removeEventListener('mousemove', onMove)
           document.removeEventListener('mouseup', onUp)
-
-          const cr = containerEl.getBoundingClientRect()
-          const dx = ev.clientX - startX
-          const dy = ev.clientY - startY
-          if (Math.abs(dx) < 3 && Math.abs(dy) < 3) return
-
-          const xPct = Math.round(((winStartLeft + dx) / cr.width) * 1000) / 10
-          const yPct = Math.round(((winStartTop + dy) / cr.height) * 1000) / 10
-          comment.meta = { ...comment.meta, x: xPct, y: yPct }
-
-          for (const pin of containerEl.querySelectorAll('.sb-comment-pin')) {
-            if (pin._commentId === comment.id) {
-              pin.style.left = `${xPct}%`
-              pin.style.top = `${yPct}%`
-              break
-            }
-          }
-
-          try {
-            await moveComment(comment.id, comment._rawBody ?? '', xPct, yPct)
-            comment._rawBody = null
-          } catch (err) { console.error('[storyboard] Failed to move comment:', err) }
         }
 
         document.addEventListener('mousemove', onMove)
