@@ -1,5 +1,11 @@
 # @dfosco/storyboard-react-primer
 
+## 1.11.0
+
+### Patch Changes
+
+-   @dfosco/storyboard-react@1.11.0
+
 ## 1.10.0
 
 ### Minor Changes

@@ -1,5 +1,21 @@
 # @dfosco/storyboard-core
 
+## 1.11.0
+
+### Minor Changes
+
+-   Comments: localStorage caching, lazy-load detail on open, draggable pins, UI polish
+
+    -   Add lightweight GraphQL query for pin rendering (no replies/reactions)
+    -   Lazy-load full comment detail only when a pin is clicked
+    -   Cache comment listings in localStorage with 2-min TTL
+    -   Make comment pins draggable to reposition (persisted to GitHub discussion)
+    -   Window drag is now temporary/view-only (does not move pin)
+    -   Unify reaction trigger and indicator pill styles
+    -   Move reply Edit/Delete buttons inline with author heading
+    -   Hide browser scrollbar in comment windows
+    -   Add Tachyons-scale gap-\* utility classes
+
 ## 1.10.0
 
 ### Minor Changes
