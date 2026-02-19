@@ -19,6 +19,8 @@
 
 - **Architecture Scanner** (`.github/skills/architecture-scanner/architecture-scanner.md`) Scans the codebase and generates architecture documentation in `.github/architecture/`. Invoke with: "scan the codebase architecture", "update the architecture", "update arch".
 
+- **Worktree** (`.github/skills/worktree/worktree.md`) — Creates a git worktree in `.worktrees/<branch-name>` and switches into it. Invoke with: "create worktree", "worktree for X", or just "worktree X".
+
 ---
 
 ## Build & Development
