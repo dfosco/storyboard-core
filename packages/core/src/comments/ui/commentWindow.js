@@ -156,6 +156,18 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
               <div class="flex items-center mb1">
                 <span class="f7 fw6 sb-fg mr1">${esc(reply.author?.login ?? 'unknown')}</span>
                 ${reply.createdAt ? `<span class="sb-fg-muted sb-f-xs">${esc(timeAgo(reply.createdAt))}</span>` : ''}
+                ${user && reply.author?.login === user.login ? `
+                <div class="flex gap-2 ml-auto flex-shrink-0">
+                  <template x-if="editingReply !== ${ri}">
+                    <button class="sb-fg-muted bg-transparent bn pointer underline-hover sb-f-xs"
+                            @click="editingReply = ${ri}; editReplyText = replyTexts[${ri}]">Edit</button>
+                  </template>
+                  <template x-if="editingReply !== ${ri}">
+                    <button class="sb-fg-danger bg-transparent bn pointer underline-hover sb-f-xs"
+                            @click="deleteReplyAt(${ri})">Delete</button>
+                  </template>
+                </div>
+                ` : ''}
               </div>
               <template x-if="editingReply !== ${ri}">
                 <p class="lh-copy sb-fg ma0 word-wrap sb-f-sm">${esc(reply.text ?? reply.body)}</p>
@@ -172,16 +184,6 @@ export function showCommentWindow(container, comment, discussion, callbacks = {}
                   </div>
                 </div>
               </template>
-              ${user && reply.author?.login === user.login ? `
-              <template x-if="editingReply !== ${ri}">
-                <div class="flex mt1 gap-2">
-                  <button class="sb-fg-muted bg-transparent bn pointer underline-hover sb-f-xs"
-                          @click="editingReply = ${ri}; editReplyText = replyTexts[${ri}]">Edit</button>
-                  <button class="sb-fg-danger bg-transparent bn pointer underline-hover sb-f-xs"
-                          @click="deleteReplyAt(${ri})">Delete</button>
-                </div>
-              </template>
-              ` : ''}
               <!-- Reply reactions -->
               <div class="flex items-center flex-wrap mt1">
                 <template x-for="(rg, rgi) in replyReactions[${ri}]" :key="rg.content">

@@ -82,8 +82,8 @@ export async function openCommentsDrawer() {
                        :src="comment.author.avatarUrl"
                        :alt="comment.author?.login ?? ''" />
                 </template>
-                <div class="flex-auto sb-min-w-0">
-                  <div class="flex items-center mb1">
+                <div class="flex flex-column flex-auto sb-min-w-0 gap-2">
+                  <div class="flex items-center">
                     <span class="f7 fw6 mr1"
                           :class="comment.meta?.resolved ? 'sb-fg-muted' : 'sb-fg'"
                           x-text="comment.author?.login ?? 'unknown'"></span>
