@@ -134,7 +134,10 @@
 .sb-lh-1      { line-height: 1; }
 
 /* Comment-specific sizing/z-index */
-.sb-comment-window  { width: 360px; max-height: 480px; z-index: 100001; }
+.sb-comment-window  { width: 360px; max-height: 480px; z-index: 100001; scrollbar-width: none; }
+.sb-comment-window::-webkit-scrollbar { display: none; }
+.sb-comment-window * { scrollbar-width: none; }
+.sb-comment-window *::-webkit-scrollbar { display: none; }
 .sb-composer        { width: 280px; z-index: 100001; }
 .sb-comment-overlay { z-index: 99998; }
 .sb-auth-backdrop   { z-index: 100000; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
