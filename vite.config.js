@@ -21,6 +21,7 @@ export default defineConfig(({ command }) => {
             // In git worktrees, npm resolves workspace packages to the main
             // worktree. Force local resolution so edits here take effect.
             '@dfosco/storyboard-core/comments/ui/comments.css': path.resolve(__dirname, 'packages/core/src/comments/ui/comments.css'),
+            '@dfosco/storyboard-core/modes.css': path.resolve(__dirname, 'packages/core/src/modes.css'),
             '@dfosco/storyboard-core/comments': path.resolve(__dirname, 'packages/core/src/comments/index.js'),
             '@dfosco/storyboard-core': path.resolve(__dirname, 'packages/core/src/index.js'),
             '@dfosco/storyboard-react/vite': path.resolve(__dirname, 'packages/react/src/vite/data-plugin.js'),

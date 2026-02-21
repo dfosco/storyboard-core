@@ -27,6 +27,9 @@ export { interceptHideParams, installHideParamListener } from './interceptHidePa
 // Hash change subscription (for reactive frameworks)
 export { subscribeToHash, getHashSnapshot } from './hashSubscribe.js'
 
+// Design modes (mode registry, switching, event bus)
+export { registerMode, unregisterMode, getRegisteredModes, getCurrentMode, activateMode, deactivateMode, subscribeToMode, getModeSnapshot, syncModeClasses, on, off, emit } from './modes.js'
+
 // Dev tools (vanilla JS, framework-agnostic)
 export { mountDevTools } from './devtools.js'
 export { mountSceneDebug } from './sceneDebug.js'

@@ -14,7 +14,8 @@
   "exports": {
     ".": "./src/index.js",
     "./comments": "./src/comments/index.js",
-    "./comments/ui/comments.css": "./src/comments/ui/comments.css"
+    "./comments/ui/comments.css": "./src/comments/ui/comments.css",
+    "./modes.css": "./src/modes.css"
   },
   "dependencies": {
     "alpinejs": "^3.15.8",

@@ -1,6 +1,17 @@
 import { Suspense } from 'react'
 import { Outlet } from 'react-router-dom'
-import { StoryboardProvider } from '@dfosco/storyboard-react'
+import { StoryboardProvider, ModeSwitch, ToolbarShell } from '@dfosco/storyboard-react'
+import { registerMode, syncModeClasses } from '@dfosco/storyboard-core'
+import '@dfosco/storyboard-core/modes.css'
+
+// Register default modes
+registerMode('prototype', { label: 'Prototype' })
+registerMode('present', { label: 'Present' })
+registerMode('canvas', { label: 'Canvas' })
+registerMode('inspect', { label: 'Inspect' })
+
+// Apply classes for whichever mode is active on page load
+syncModeClasses()
 
 function PageLoading() {
   return (
@@ -26,6 +37,8 @@ export default function App() {
       <Suspense fallback={<PageLoading />}>
         <Outlet />
       </Suspense>
+      <ModeSwitch />
+      <ToolbarShell />
     </StoryboardProvider>
   )
 }
