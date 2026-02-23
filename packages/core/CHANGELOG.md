@@ -1,5 +1,11 @@
 # @dfosco/storyboard-core
 
+## 1.12.0
+
+### Minor Changes
+
+-   States represented via classes on DOM
+
 ## 1.11.3
 
 ### Patch Changes

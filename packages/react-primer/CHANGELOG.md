@@ -1,5 +1,16 @@
 # @dfosco/storyboard-react-primer
 
+## 1.12.0
+
+### Minor Changes
+
+-   States represented via classes on DOM
+
+### Patch Changes
+
+-   Updated dependencies
+    -   @dfosco/storyboard-react@1.12.0
+
 ## 1.11.3
 
 ### Patch Changes
