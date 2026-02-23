@@ -1,5 +1,11 @@
 # @dfosco/storyboard-core
 
+## 1.11.3
+
+### Patch Changes
+
+-   Republish: body class sync for overrides and scenes (v1.11.2 was a partial publish).
+
 ## 1.11.2
 
 ### Patch Changes
