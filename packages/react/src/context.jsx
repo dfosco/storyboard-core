@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
 // Side-effect import: seeds the core data index via init()
 import 'virtual:storyboard-data-index'
-import { loadScene, sceneExists, findRecord, deepMerge, setSceneClass } from '@dfosco/storyboard-core'
+import { loadScene, sceneExists, findRecord, deepMerge, setSceneClass, installBodyClassSync } from '@dfosco/storyboard-core'
 import { StoryboardContext } from './StoryboardContext.js'
 
 export { StoryboardContext }
@@ -33,6 +33,9 @@ export default function StoryboardProvider({ sceneName, recordName, recordParam,
   const pageScene = getPageSceneName(location.pathname)
   const activeSceneName = sceneParam || sceneName || (sceneExists(pageScene) ? pageScene : 'default')
   const params = useParams()
+
+  // Auto-install body class sync (sb-key--value classes on <body>)
+  useEffect(() => installBodyClassSync(), [])
 
   const { data, error } = useMemo(() => {
     try {

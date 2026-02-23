@@ -1,5 +1,11 @@
 # @dfosco/storyboard-core
 
+## 1.14.0
+
+### Minor Changes
+
+-   Fix state class being added to body
+
 ## 1.13.0
 
 ### Minor Changes

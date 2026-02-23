@@ -1,5 +1,16 @@
 # @dfosco/storyboard-react
 
+## 1.14.0
+
+### Minor Changes
+
+-   Fix state class being added to body
+
+### Patch Changes
+
+-   Updated dependencies
+    -   @dfosco/storyboard-core@1.14.0
+
 ## 1.13.0
 
 ### Minor Changes
