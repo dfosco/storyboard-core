@@ -1,5 +1,14 @@
 # @dfosco/storyboard-react
 
+## 1.11.2
+
+### Patch Changes
+
+-   8f3c8bc: Add state-based classes to body tag
+-   Updated dependencies [7a24fd0]
+-   Updated dependencies [8f3c8bc]
+    -   @dfosco/storyboard-core@1.11.2
+
 ## 1.11.1
 
 ### Patch Changes

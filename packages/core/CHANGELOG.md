@@ -1,5 +1,12 @@
 # @dfosco/storyboard-core
 
+## 1.11.2
+
+### Patch Changes
+
+-   7a24fd0: Add body class sync: mirrors active overrides as `sb-{key}--{value}` and scene as `sb-scene--{name}` CSS classes on `<body>`. Classes update reactively on hash/storage changes and scene switches. Use `:global(.sb-theme--dark)` in CSS Modules to conditionally style components based on storyboard state.
+-   8f3c8bc: Add state-based classes to body tag
+
 ## 1.11.1
 
 ### Patch Changes
