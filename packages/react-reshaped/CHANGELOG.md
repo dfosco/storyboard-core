@@ -1,5 +1,16 @@
 # @dfosco/storyboard-react-reshaped
 
+## 1.13.0
+
+### Minor Changes
+
+-   Change viewfinder to display branches as a dropdown
+
+### Patch Changes
+
+-   Updated dependencies
+    -   @dfosco/storyboard-react@1.13.0
+
 ## 1.12.0
 
 ### Minor Changes

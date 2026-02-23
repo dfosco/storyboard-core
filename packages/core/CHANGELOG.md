@@ -1,5 +1,11 @@
 # @dfosco/storyboard-core
 
+## 1.13.0
+
+### Minor Changes
+
+-   Change viewfinder to display branches as a dropdown
+
 ## 1.12.0
 
 ### Minor Changes
