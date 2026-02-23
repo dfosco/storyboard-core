@@ -27,6 +27,9 @@ export { interceptHideParams, installHideParamListener } from './interceptHidePa
 // Hash change subscription (for reactive frameworks)
 export { subscribeToHash, getHashSnapshot } from './hashSubscribe.js'
 
+// Body class sync (overrides + scene → <body> classes)
+export { installBodyClassSync, setSceneClass, syncOverrideClasses } from './bodyClasses.js'
+
 // Dev tools (vanilla JS, framework-agnostic)
 export { mountDevTools } from './devtools.js'
 export { mountSceneDebug } from './sceneDebug.js'

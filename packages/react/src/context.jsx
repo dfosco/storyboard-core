@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
 // Side-effect import: seeds the core data index via init()
 import 'virtual:storyboard-data-index'
-import { loadScene, sceneExists, findRecord, deepMerge } from '@dfosco/storyboard-core'
+import { loadScene, sceneExists, findRecord, deepMerge, setSceneClass } from '@dfosco/storyboard-core'
 import { StoryboardContext } from './StoryboardContext.js'
 
 export { StoryboardContext }
@@ -46,6 +46,7 @@ export default function StoryboardProvider({ sceneName, recordName, recordParam,
         }
       }
 
+      setSceneClass(activeSceneName)
       return { data: sceneData, error: null }
     } catch (err) {
       return { data: null, error: err.message }

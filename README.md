@@ -530,6 +530,45 @@ Hash is **not** preserved when:
 
 ---
 
+## Body Class Sync
+
+Storyboard automatically mirrors active **overrides** and the current **scene** as CSS classes on `<body>`. This lets you conditionally style components based on storyboard state using CSS — including CSS Modules.
+
+### Class format
+
+| Source | Class pattern | Example |
+|--------|--------------|---------|
+| Override `key=value` | `sb-{key}--{value}` | `theme=dark` → `sb-theme--dark` |
+| Dot-notation override | Dots become dashes | `settings.theme=dark` → `sb-settings-theme--dark` |
+| Active scene | `sb-scene--{name}` | Scene "Dashboard" → `sb-scene--dashboard` |
+
+Classes are added/removed reactively — no page reload needed. Works in both normal mode (URL hash) and hide mode (localStorage shadows).
+
+### Usage with CSS Modules
+
+Use `:global()` to reference body classes from CSS Modules:
+
+```css
+/* MyComponent.module.css */
+:global(.sb-theme--dark) .panel {
+  background: var(--bgColor-muted);
+}
+
+:global(.sb-scene--dashboard) .sidebar {
+  display: block;
+}
+
+:global(.sb-settings-theme--compact) .container {
+  padding: 8px;
+}
+```
+
+### Setup
+
+`installBodyClassSync()` is called in the app entry (`src/index.jsx`) alongside other install functions. `setSceneClass()` is called automatically by `StoryboardProvider`. No additional setup needed.
+
+---
+
 ## API Reference
 
 ### Hooks (`@dfosco/storyboard-react`)
@@ -586,6 +625,9 @@ Hash is **not** preserved when:
 | `isHideMode()` / `activateHideMode()` / `deactivateHideMode()` | Toggle clean-URL mode (overrides move from hash to localStorage). |
 | `installHideParamListener()` | Listens for `?hide` / `?show` URL params to toggle hide mode. |
 | `installHistorySync()` | Syncs hash changes to the undo/redo history stack. |
+| `installBodyClassSync()` | Mirrors active overrides and scene to `<body>` CSS classes. Returns unsubscribe function. |
+| `setSceneClass(name)` | Sets `sb-scene--{name}` class on `<body>`. Called automatically by `StoryboardProvider`. |
+| `syncOverrideClasses()` | Manually sync override classes (called automatically by `installBodyClassSync`). |
 
 ### Utilities (`@dfosco/storyboard-react`)
 
