@@ -74,6 +74,15 @@ function PlaceholderGraphic({ name }) {
 }
 
 /**
+ * Derive the current branch label from the base path.
+ * Branch deploy folders use the convention `branch--<name>/`.
+ */
+function getCurrentBranch(basePath) {
+  const match = (basePath || '').match(/\/branch--([^/]+)\/?$/)
+  return match ? match[1] : 'main'
+}
+
+/**
  * Viewfinder — scene index and branch preview dashboard.
  *
  * @param {Object} props
@@ -99,6 +108,8 @@ export default function Viewfinder({ scenes = {}, pageModules = {}, basePath, ti
     return base.replace(/\/branch--[^/]*\/$/, '/')
   }, [basePath])
 
+  const currentBranch = useMemo(() => getCurrentBranch(basePath), [basePath])
+
   useEffect(() => {
     const url = `${branchBasePath}branches.json`
     fetch(url)
@@ -107,13 +118,39 @@ export default function Viewfinder({ scenes = {}, pageModules = {}, basePath, ti
       .catch(() => setBranches([]))
   }, [branchBasePath])
 
+  const handleBranchChange = (e) => {
+    const folder = e.target.value
+    if (folder) {
+      window.location.href = `${branchBasePath}${folder}/`
+    }
+  }
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>{title}</h1>
+        <div className={styles.headerTop}>
+          <h1 className={styles.title}>{title}</h1>
+          {branches && branches.length > 0 && (
+            <div className={styles.branchDropdown}>
+              <label className={styles.branchLabel} htmlFor="branch-select">Branch</label>
+              <select
+                id="branch-select"
+                className={styles.branchSelect}
+                defaultValue=""
+                onChange={handleBranchChange}
+              >
+                <option value="" disabled>{currentBranch}</option>
+                {branches.map((b) => (
+                  <option key={b.folder} value={b.folder}>
+                    {b.branch}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
         <p className={styles.subtitle}>
           {sceneNames.length} scene{sceneNames.length !== 1 ? 's' : ''}
-          {branches && branches.length > 0 ? ` · ${branches.length} branch preview${branches.length !== 1 ? 's' : ''}` : ''}
         </p>
       </header>
 
@@ -146,29 +183,6 @@ export default function Viewfinder({ scenes = {}, pageModules = {}, basePath, ti
                 </a>
               )
             })}
-          </div>
-        </section>
-      )}
-
-      {branches && branches.length > 0 && (
-        <section className={styles.branchSection}>
-          <h2 className={styles.sectionTitle}>Branch Previews</h2>
-          <div className={styles.grid}>
-            {branches.map((b) => (
-              <a
-                key={b.folder}
-                href={`${branchBasePath}${b.folder}/`}
-                className={styles.card}
-              >
-                <div className={styles.thumbnail}>
-                  <PlaceholderGraphic name={b.branch} />
-                </div>
-                <div className={styles.cardBody}>
-                  <p className={styles.sceneName}>{b.branch}</p>
-                  <p className={styles.branchMeta}>{b.folder}</p>
-                </div>
-              </a>
-            ))}
           </div>
         </section>
       )}
