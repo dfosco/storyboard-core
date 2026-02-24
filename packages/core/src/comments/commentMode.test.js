@@ -35,7 +35,8 @@ describe('commentMode', () => {
 
   it('toggleCommentMode returns false when not authenticated', () => {
     initCommentsConfig({
-      comments: { repo: { owner: 'o', name: 'r' } },
+      comments: { discussions: { category: 'Test' } },
+      repository: { owner: 'o', name: 'r' },
     })
     const result = toggleCommentMode()
     expect(result).toBe(false)
@@ -44,7 +45,8 @@ describe('commentMode', () => {
 
   it('toggleCommentMode activates when enabled and authenticated', () => {
     initCommentsConfig({
-      comments: { repo: { owner: 'o', name: 'r' } },
+      comments: { discussions: { category: 'Test' } },
+      repository: { owner: 'o', name: 'r' },
     })
     setToken('ghp_test')
     const result = toggleCommentMode()
@@ -54,7 +56,8 @@ describe('commentMode', () => {
 
   it('toggleCommentMode toggles off when active', () => {
     initCommentsConfig({
-      comments: { repo: { owner: 'o', name: 'r' } },
+      comments: { discussions: { category: 'Test' } },
+      repository: { owner: 'o', name: 'r' },
     })
     setToken('ghp_test')
     toggleCommentMode() // on
