@@ -18,7 +18,7 @@
         "test:watch": "vitest",
         "test:core": "vitest run packages/core",
         "test:react": "vitest run packages/react",
-        "release": "sh -c 'V=$1; shift; npx changeset && npx changeset version && git add -A && git commit -m \"chore: version packages $V\" $* && npx changeset publish && git push --follow-tags' _"
+        "release": "./scripts/release.sh"
     },
     "dependencies": {
         "@generouted/react-router": "^1.19.11",
