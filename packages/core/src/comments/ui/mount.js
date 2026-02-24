@@ -28,14 +28,12 @@ function esc(str) {
 }
 
 function getContentContainer() {
-  return document.querySelector('main') || document.body
+  return document.body
 }
 
 function ensureOverlay() {
   if (overlay) return overlay
   const container = getContentContainer()
-  const pos = getComputedStyle(container).position
-  if (pos === 'static') container.style.position = 'relative'
 
   overlay = document.createElement('div')
   overlay.className = 'sb-comment-overlay absolute top-0 right-0 bottom-0 left-0 pe-none'

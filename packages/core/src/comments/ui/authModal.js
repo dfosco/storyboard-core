@@ -8,6 +8,10 @@ import { setToken, validateToken, clearToken, getCachedUser } from '../auth.js'
 
 const MODAL_ID = 'sb-auth-modal'
 
+// Mutable ref updated on each openAuthModal() call so the Alpine factory
+// (registered once) always reaches the *current* modal's resolve/backdrop.
+const _ref = { resolve: null, onKeyDown: null, backdrop: null }
+
 /**
  * Open the auth modal. Returns a promise that resolves with the user info
  * on successful sign-in, or null if cancelled.
@@ -65,27 +69,34 @@ export function openAuthModal() {
 
     document.body.appendChild(backdrop)
 
-    // Close on backdrop click
-    backdrop.addEventListener('click', (e) => {
-      if (e.target === backdrop) {
-        backdrop.remove()
-        resolve(null)
-      }
-    })
-
     // Escape key
     function onKeyDown(e) {
       if (e.key === 'Escape') {
         e.preventDefault()
         e.stopPropagation()
-        window.removeEventListener('keydown', onKeyDown, true)
-        backdrop.remove()
-        resolve(null)
+        window.removeEventListener('keydown', _ref.onKeyDown, true)
+        _ref.backdrop.remove()
+        _ref.resolve(null)
       }
     }
+
+    // Update shared ref so Alpine callbacks always target the current modal
+    _ref.resolve = resolve
+    _ref.onKeyDown = onKeyDown
+    _ref.backdrop = backdrop
+
+    // Close on backdrop click
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) {
+        window.removeEventListener('keydown', _ref.onKeyDown, true)
+        _ref.backdrop.remove()
+        _ref.resolve(null)
+      }
+    })
+
     window.addEventListener('keydown', onKeyDown, true)
 
-    // Register Alpine component
+    // Register Alpine component once — reads _ref for current modal context
     if (!window.Alpine._sbAuthRegistered) {
       window.Alpine.data('sbAuthModal', () => ({
         token: '',
@@ -112,16 +123,16 @@ export function openAuthModal() {
         },
 
         done() {
-          window.removeEventListener('keydown', onKeyDown, true)
+          window.removeEventListener('keydown', _ref.onKeyDown, true)
           const user = this.user
-          backdrop.remove()
-          resolve(user)
+          _ref.backdrop.remove()
+          _ref.resolve(user)
         },
 
         close() {
-          window.removeEventListener('keydown', onKeyDown, true)
-          backdrop.remove()
-          resolve(null)
+          window.removeEventListener('keydown', _ref.onKeyDown, true)
+          _ref.backdrop.remove()
+          _ref.resolve(null)
         },
       }))
       window.Alpine._sbAuthRegistered = true
