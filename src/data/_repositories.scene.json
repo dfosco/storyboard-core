@@ -1,0 +1,10 @@
+{
+  "sceneMeta": {
+    "author": "dfosco",
+    "title": "DSP Repositories"
+  },
+  "$global": "dsp-navigation",
+  "repositories": {
+    "$ref": "dsp-repositories"
+  }
+}
