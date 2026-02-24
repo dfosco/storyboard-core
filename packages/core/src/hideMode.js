@@ -386,8 +386,11 @@ export function syncHashToHistory() {
  * Also records the initial page load as the first history entry.
  */
 export function installHistorySync() {
-  // Record initial page state
-  pushSnapshot()
+  // Record initial page state — but skip in hide mode where the hash
+  // is intentionally empty; pushing it would clobber the real shadow data.
+  if (!isHideMode()) {
+    pushSnapshot()
+  }
 
   window.addEventListener('hashchange', () => syncHashToHistory())
   window.addEventListener('popstate', () => syncHashToHistory())

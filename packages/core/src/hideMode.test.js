@@ -14,6 +14,7 @@ import {
   removeShadow,
   getAllShadows,
   syncHashToHistory,
+  installHistorySync,
 } from './hideMode.js'
 
 // ── Hide Mode Toggle ──
@@ -216,5 +217,52 @@ describe('syncHashToHistory', () => {
     const lengthBefore = getOverrideHistory().length
     syncHashToHistory()
     expect(getOverrideHistory().length).toBe(lengthBefore)
+  })
+})
+
+// ── installHistorySync ──
+
+describe('installHistorySync', () => {
+  it('records initial page state in normal mode', () => {
+    window.location.hash = '#x=1'
+    installHistorySync()
+    const history = getOverrideHistory()
+    expect(history.length).toBe(1)
+    expect(history[0][2]).toContain('x=1')
+  })
+
+  it('does NOT push empty snapshot on startup when in hide mode', () => {
+    // Simulate: user had data, activated hide mode, then refreshed
+    window.location.hash = '#color=red'
+    activateHideMode()                       // snapshots hash, clears URL
+    setShadow('color', 'blue')               // update shadow data
+    const historyBefore = getOverrideHistory().length
+    const indexBefore = getCurrentIndex()
+
+    // Now simulate page refresh — hash is empty, hide mode still active
+    window.location.hash = ''
+    installHistorySync()
+
+    // History should NOT have gained an empty snapshot
+    expect(getOverrideHistory().length).toBe(historyBefore)
+    expect(getCurrentIndex()).toBe(indexBefore)
+    // Shadow data should still be intact
+    expect(getShadow('color')).toBe('blue')
+  })
+
+  it('preserves shadow data through hide→refresh→show cycle', () => {
+    window.location.hash = '#name=Alice'
+    activateHideMode()
+    setShadow('name', 'Bob')
+
+    // Simulate refresh in hide mode
+    window.location.hash = ''
+    installHistorySync()
+
+    // Now deactivate (show mode) — shadow data should restore to hash
+    deactivateHideMode()
+    expect(isHideMode()).toBe(false)
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+    expect(params.get('name')).toBe('Bob')
   })
 })
