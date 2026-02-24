@@ -7,9 +7,6 @@ import {
   redo,
   getOverrideHistory,
   getCurrentIndex,
-  getNextIndex,
-  getCurrentSnapshot,
-  getCurrentRoute,
   canUndo,
   canRedo,
   getShadow,
@@ -17,7 +14,6 @@ import {
   removeShadow,
   getAllShadows,
   syncHashToHistory,
-  installHistorySync,
 } from './hideMode.js'
 
 // ── Hide Mode Toggle ──

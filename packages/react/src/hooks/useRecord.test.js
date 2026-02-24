@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react'
+import { renderHook } from '@testing-library/react'
 import { seedTestData, TEST_RECORDS } from '../../test-utils.js'
 
 vi.mock('react-router-dom', async () => {

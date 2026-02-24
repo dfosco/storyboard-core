@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { useContext } from 'react'
 import { init } from '@dfosco/storyboard-core'
 import StoryboardProvider, { StoryboardContext } from './context.jsx'
-import { useLocation } from 'react-router-dom'
+
 
 const mockUseLocation = vi.fn(() => ({ pathname: '/', search: '', hash: '' }))
 

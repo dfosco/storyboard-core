@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useContext, useState, useEffect } from 'react'
 import { Textarea as PrimerTextarea } from '@primer/react'
 import { FormContext } from '@dfosco/storyboard-react'

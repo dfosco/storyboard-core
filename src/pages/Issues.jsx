@@ -2,7 +2,6 @@ import Application from '../templates/Application/Application.jsx'
 
 import {
   IssueOpenedIcon,
-  ThreeBarsIcon,
   CodeIcon,
   GitPullRequestIcon,
   CommentDiscussionIcon,
@@ -10,7 +9,6 @@ import {
   PlayIcon,
   ProjectIcon,
   GraphIcon,
-  MarkGithubIcon,
   SmileyIcon,
   PersonIcon,
   MentionIcon

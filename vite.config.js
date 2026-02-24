@@ -11,7 +11,7 @@ import { repository } from './storyboard.config.json'
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname)
 
-export default defineConfig(({ command }) => {
+export default defineConfig(() => {
     const base = process.env.VITE_BASE_PATH || `/${repository.name}/`
 
     return {

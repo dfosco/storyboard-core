@@ -48,7 +48,7 @@ describe('mount.js', () => {
   // All sibling modules must also be re-imported so they share the same instances.
   let mountComments
   let setCommentMode
-  let isCommentModeActive
+  let isCommentModeActive // eslint-disable-line no-unused-vars
   let initCommentsConfig
   let setToken
   let clearToken

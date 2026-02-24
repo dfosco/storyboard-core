@@ -16,7 +16,7 @@ function timeAgo(dateStr) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-function esc(str) {
+function esc(str) { // eslint-disable-line no-unused-vars
   const d = document.createElement('div')
   d.textContent = str ?? ''
   return d.innerHTML

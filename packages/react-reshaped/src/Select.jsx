@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useContext, useState, useEffect } from 'react'
 import { Select as ReshapedSelect } from 'reshaped'
 import { FormContext, useOverride } from '@dfosco/storyboard-react'

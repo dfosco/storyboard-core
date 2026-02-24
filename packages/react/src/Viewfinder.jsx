@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+
 import { useState, useEffect, useMemo } from 'react'
 import { hash, resolveSceneRoute, getSceneMeta } from '@dfosco/storyboard-core'
 import styles from './Viewfinder.module.css'

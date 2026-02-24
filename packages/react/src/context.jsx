@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useEffect, useMemo } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
 // Side-effect import: seeds the core data index via init()
@@ -54,7 +53,7 @@ export default function StoryboardProvider({ sceneName, recordName, recordParam,
     } catch (err) {
       return { data: null, error: err.message }
     }
-  }, [activeSceneName, recordName, recordParam, params, location.pathname])
+  }, [activeSceneName, recordName, recordParam, params])
 
   const value = {
     data,

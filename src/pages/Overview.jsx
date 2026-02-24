@@ -1,22 +1,15 @@
-import { Stack, Text, Button } from '@primer/react'
-import { CheckIcon } from '@primer/octicons-react'
+import { Text, Button } from '@primer/react'
 import Application from '../templates/Application/Application.jsx'
 import styles from "./overview.module.css";
 
 import {
   IssueOpenedIcon,
-  ThreeBarsIcon,
-  CodeIcon,
   GitPullRequestIcon,
   CommentDiscussionIcon,
   ShieldIcon,
   PlayIcon,
   ProjectIcon,
   GraphIcon,
-  MarkGithubIcon,
-  SmileyIcon,
-  PersonIcon,
-  MentionIcon,
   HomeIcon
 } from '@primer/octicons-react'
 

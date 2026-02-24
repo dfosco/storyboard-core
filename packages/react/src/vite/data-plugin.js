@@ -131,7 +131,6 @@ export default function storyboardDataPlugin() {
 
     configureServer(server) {
       // Watch for data file changes in dev mode
-      const dataGlob = GLOB_PATTERN
       const watcher = server.watcher
 
       const invalidate = (filePath) => {

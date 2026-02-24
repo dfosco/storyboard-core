@@ -7,7 +7,7 @@
  */
 
 import { vi } from 'vitest'
-import { clearToken } from '../auth.js'
+import { clearToken } from '../auth.js' // eslint-disable-line no-unused-vars -- kept for future test coverage
 
 // Store the Alpine component factory so tests can call done()/close()/submit()
 let alpineFactory = null

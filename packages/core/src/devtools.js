@@ -187,7 +187,7 @@ export function mountDevTools(options = {}) {
 
   let visible = true
   let menuOpen = false
-  let panelOpen = false
+  let panelOpen = false // eslint-disable-line no-unused-vars
 
   // Build DOM
   const wrapper = document.createElement('div')

@@ -95,7 +95,7 @@ export default function IssueDetail() {
             <View.Item grow>
               <View direction="column" gap={4} align="center" paddingBlock={16}>
                 <Text variant="featured-2" weight="bold">Issue not found</Text>
-                <Text variant="body-3" color="neutral-faded">The issue you're looking for doesn't exist.</Text>
+                <Text variant="body-3" color="neutral-faded">The issue you&apos;re looking for doesn&apos;t exist.</Text>
                 <Link to="/issues">← Back to all issues</Link>
               </View>
             </View.Item>

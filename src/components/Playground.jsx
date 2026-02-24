@@ -29,7 +29,7 @@ function Playground() {
                 className={styles.contentBox}
             >
                 <CodeLine icon={CheckIcon} iconColor="success.fg">
-                    Mona's playground successfully initialised...
+                    Mona&apos;s playground successfully initialised...
                 </CodeLine>
                 <CodeLine icon={CommentIcon} iconColor="accent.fg">
                     Visit <Text className={styles.warningText}>src/Playground.js</Text>{' '}
@@ -49,7 +49,7 @@ function Playground() {
     )
 }
 
-function CodeLine({ icon: IconComponent, iconColor, children }) {
+function CodeLine({ icon: IconComponent, children }) {
     return (
         <Stack direction="horizontal" className={styles.codeLine}>
             <Stack className={styles.iconWrapper}>

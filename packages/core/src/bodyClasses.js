@@ -24,7 +24,7 @@ const SCENE_PREFIX = 'sb-scene--'
 function sanitize(str) {
   return String(str)
     .toLowerCase()
-    .replace(/[\.\s]+/g, '-')
+    .replace(/[.\s]+/g, '-')
     .replace(/[^a-z0-9-]/g, '')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '')

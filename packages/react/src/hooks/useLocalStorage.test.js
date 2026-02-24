@@ -1,4 +1,3 @@
-import React from 'react'
 import { renderHook, act } from '@testing-library/react'
 import { seedTestData, createWrapper, TEST_SCENES } from '../../test-utils.js'
 import { useLocalStorage } from './useLocalStorage.js'
