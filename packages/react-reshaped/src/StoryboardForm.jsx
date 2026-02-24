@@ -1,6 +1,6 @@
 import { useRef, useCallback } from 'react'
 import { FormContext } from '@dfosco/storyboard-react'
-import { setParam } from '@dfosco/storyboard-core'
+import { setParam, isHideMode, setShadow } from '@dfosco/storyboard-core'
 
 /**
  * A form wrapper that buffers input values locally and only
@@ -31,8 +31,9 @@ export default function StoryboardForm({ data, onSubmit, children, ...props }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (prefix) {
+      const write = isHideMode() ? setShadow : setParam
       for (const [name, value] of Object.entries(draftsRef.current)) {
-        setParam(`${prefix}.${name}`, value)
+        write(`${prefix}.${name}`, value)
       }
     }
     if (onSubmit) onSubmit(e)

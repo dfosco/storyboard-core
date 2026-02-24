@@ -3,10 +3,15 @@ import { useParams } from 'react-router-dom'
 import { loadRecord } from '@dfosco/storyboard-core'
 import { deepClone, setByPath } from '@dfosco/storyboard-core'
 import { getAllParams } from '@dfosco/storyboard-core'
+import { isHideMode, getAllShadows } from '@dfosco/storyboard-core'
 import { subscribeToHash, getHashSnapshot } from '@dfosco/storyboard-core'
+import { subscribeToStorage, getStorageSnapshot } from '@dfosco/storyboard-core'
 
 /**
- * Collect hash overrides for a record and merge them into the base array.
+ * Collect overrides for a record and merge them into the base array.
+ *
+ * In normal mode reads from URL hash params; in hide mode reads from
+ * localStorage shadow snapshots.
  *
  * Hash convention: record.{recordName}.{entryId}.{field}=value
  *
@@ -18,7 +23,7 @@ import { subscribeToHash, getHashSnapshot } from '@dfosco/storyboard-core'
  * @returns {Array} Merged array
  */
 function applyRecordOverrides(baseRecords, recordName) {
-  const allParams = getAllParams()
+  const allParams = isHideMode() ? getAllShadows() : getAllParams()
   const prefix = `record.${recordName}.`
 
   // Collect only the params that target this record
@@ -87,8 +92,9 @@ export function useRecord(recordName, paramName = 'id') {
   const params = useParams()
   const paramValue = params[paramName]
 
-  // Re-render on hash changes so overrides are reactive
+  // Re-render on hash or localStorage changes so overrides are reactive
   const hashString = useSyncExternalStore(subscribeToHash, getHashSnapshot)
+  const storageString = useSyncExternalStore(subscribeToStorage, getStorageSnapshot)
 
   return useMemo(() => {
     if (!paramValue) return null
@@ -100,7 +106,7 @@ export function useRecord(recordName, paramName = 'id') {
       console.error(`[useRecord] ${err.message}`)
       return null
     }
-  }, [recordName, paramName, paramValue, hashString]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [recordName, paramName, paramValue, hashString, storageString]) // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 /**
@@ -115,8 +121,9 @@ export function useRecord(recordName, paramName = 'id') {
  * const allPosts = useRecords('posts')
  */
 export function useRecords(recordName) {
-  // Re-render on hash changes so overrides are reactive
+  // Re-render on hash or localStorage changes so overrides are reactive
   const hashString = useSyncExternalStore(subscribeToHash, getHashSnapshot)
+  const storageString = useSyncExternalStore(subscribeToStorage, getStorageSnapshot)
 
   return useMemo(() => {
     try {
@@ -126,5 +133,5 @@ export function useRecords(recordName) {
       console.error(`[useRecords] ${err.message}`)
       return []
     }
-  }, [recordName, hashString]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [recordName, hashString, storageString]) // eslint-disable-line react-hooks/exhaustive-deps
 }

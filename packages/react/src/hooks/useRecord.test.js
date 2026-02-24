@@ -1,5 +1,6 @@
-import { renderHook } from '@testing-library/react'
+import { renderHook, act } from '@testing-library/react'
 import { seedTestData, TEST_RECORDS } from '../../test-utils.js'
+import { activateHideMode, setShadow } from '@dfosco/storyboard-core'
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom')
@@ -77,5 +78,53 @@ describe('useRecords', () => {
     const newPost = result.current.find(e => e.id === 'new-post')
     expect(newPost).toBeTruthy()
     expect(newPost.title).toBe('New')
+  })
+})
+
+// ── Hide mode ──
+
+describe('useRecord (hide mode)', () => {
+  beforeEach(() => {
+    act(() => { activateHideMode() })
+  })
+
+  it('reads overrides from localStorage shadow in hide mode', () => {
+    useParams.mockReturnValue({ id: 'post-1' })
+    act(() => { setShadow('record.posts.post-1.title', 'Shadow Title') })
+
+    const { result } = renderHook(() => useRecord('posts'))
+    expect(result.current.title).toBe('Shadow Title')
+  })
+
+  it('reactively updates when shadow changes in hide mode', () => {
+    useParams.mockReturnValue({ id: 'post-1' })
+    const { result } = renderHook(() => useRecord('posts'))
+    expect(result.current.title).toBe('First Post')
+
+    act(() => { setShadow('record.posts.post-1.title', 'Updated via Shadow') })
+    expect(result.current.title).toBe('Updated via Shadow')
+  })
+})
+
+describe('useRecords (hide mode)', () => {
+  beforeEach(() => {
+    act(() => { activateHideMode() })
+  })
+
+  it('applies shadow overrides to existing entries', () => {
+    act(() => { setShadow('record.posts.post-1.title', 'Hidden Update') })
+
+    const { result } = renderHook(() => useRecords('posts'))
+    const post1 = result.current.find(e => e.id === 'post-1')
+    expect(post1.title).toBe('Hidden Update')
+  })
+
+  it('creates new entries from shadow overrides', () => {
+    act(() => { setShadow('record.posts.shadow-post.title', 'New Shadow') })
+
+    const { result } = renderHook(() => useRecords('posts'))
+    const newPost = result.current.find(e => e.id === 'shadow-post')
+    expect(newPost).toBeTruthy()
+    expect(newPost.title).toBe('New Shadow')
   })
 })
