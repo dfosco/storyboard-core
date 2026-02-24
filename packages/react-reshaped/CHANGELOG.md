@@ -1,5 +1,19 @@
 # @dfosco/storyboard-react-reshaped
 
+## 1.15.0
+
+### Minor Changes
+
+-   -   Fix bug in comment mode
+    -   Improve and increase test surface
+    -   Improve release script
+    -   Adjust linter
+
+### Patch Changes
+
+-   Updated dependencies
+    -   @dfosco/storyboard-react@1.15.0
+
 ## 1.14.0
 
 ### Minor Changes

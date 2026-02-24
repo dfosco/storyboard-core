@@ -1,5 +1,14 @@
 # @dfosco/storyboard-core
 
+## 1.15.0
+
+### Minor Changes
+
+-   -   Fix bug in comment mode
+    -   Improve and increase test surface
+    -   Improve release script
+    -   Adjust linter
+
 ## 1.14.0
 
 ### Minor Changes
