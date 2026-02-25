@@ -1,5 +1,13 @@
 # @dfosco/storyboard-react
 
+## 1.15.1
+
+### Patch Changes
+
+-   Fix bug in hide mode, add dark-mode comment cursor
+-   Updated dependencies
+    -   @dfosco/storyboard-core@1.15.1
+
 ## 1.15.0
 
 ### Minor Changes
