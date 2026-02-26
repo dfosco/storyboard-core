@@ -10,6 +10,7 @@ const makeIndex = () => ({
     'no-route': { title: 'No route key' },
     'meta-route': { sceneMeta: { route: 'Repositories' }, title: 'Meta Route' },
     'meta-author': { sceneMeta: { author: 'dfosco' }, title: 'With Author' },
+    'meta-authors': { sceneMeta: { author: ['dfosco', 'heyamie', 'branonconor'] }, title: 'Multi Author' },
     'meta-both': { sceneMeta: { route: '/Overview', author: 'octocat' }, title: 'Both' },
   },
   objects: {},
@@ -113,6 +114,10 @@ describe('getSceneMeta', () => {
 
   it('returns sceneMeta with both fields', () => {
     expect(getSceneMeta('meta-both')).toEqual({ route: '/Overview', author: 'octocat' })
+  })
+
+  it('returns sceneMeta with array author', () => {
+    expect(getSceneMeta('meta-authors')).toEqual({ author: ['dfosco', 'heyamie', 'branonconor'] })
   })
 
   it('returns null when no sceneMeta', () => {

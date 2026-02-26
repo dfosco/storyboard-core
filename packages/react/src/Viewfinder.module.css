@@ -2,34 +2,70 @@
   min-height: 100vh;
   background-color: var(--bgColor-default, #0d1117);
   color: var(--fgColor-default, #e6edf3);
-  padding: 48px 32px;
+  padding: 80px 32px 48px;
 }
 
 .header {
-  max-width: 960px;
-  margin: 0 auto 40px;
+  max-width: 720px;
+  margin: 0 auto 64px;
 }
 
 .title {
-  font-size: 28px;
-  font-weight: 600;
-  margin: 0 0 8px;
+  font-size: 72px;
+  font-weight: 400;
+  margin: 0 0 12px;
   color: var(--fgColor-default, #e6edf3);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  line-height: 1;
 }
 
 .subtitle {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--fgColor-muted, #848d97);
-  margin: 0;
+  margin: 4px 0 0;
+  letter-spacing: 0.01em;
+}
+
+.sceneCount {
+  font-size: 13px;
+  color: var(--fgColor-muted, #848d97);
+  margin: 16px 0 0;
+  letter-spacing: 0.01em;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 16px;
-  max-width: 960px;
+  max-width: 720px;
   margin: 0 auto;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.listItem {
+  display: block;
+  padding: 8px 0;
+  text-decoration: none;
+  color: inherit;
+  /* border-bottom: 1px solid var(--borderColor-muted, #21262d); */
+}
+
+.listItem:first-child {
+  /* border-top: 1px solid var(--borderColor-muted, #21262d); */
+}
+
+.listItem:hover {
+  text-decoration: none !important;
+}
+
+.listItem .author {
+  margin-top: 8px;
 }
 
 .card {
@@ -71,33 +107,39 @@
 
 .cardBody {
   padding: 12px 16px;
-  border-top: 1px solid var(--borderColor-default, #30363d);
+
+  &:hover {
+    background-color: var(--bgColor-muted);
+  }
 }
 
 .sceneName {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 28px;
+  font-weight: 400;
   color: var(--fgColor-default, #e6edf3);
   margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  transition: font-style 0.15s ease;
 }
 
 .empty {
   text-align: center;
   padding: 80px 24px;
   color: var(--fgColor-muted, #848d97);
-  font-size: 14px;
-  max-width: 960px;
+  font-size: 15px;
+  max-width: 720px;
   margin: 0 auto;
 }
 
 .sectionTitle {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.12em;
   color: var(--fgColor-muted, #848d97);
-  margin: 0 auto 12px;
-  max-width: 960px;
+  margin: 0 auto 20px;
+  max-width: 720px;
 }
 
 .headerTop {
@@ -110,35 +152,38 @@
 .branchDropdown {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0;
   flex-shrink: 0;
+  position: relative;
 }
 
-.branchLabel {
-  font-size: 12px;
-  font-weight: 500;
+.branchIcon {
+  position: absolute;
+  left: 10px;
   color: var(--fgColor-muted, #848d97);
-  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .branchSelect {
   appearance: none;
-  background-color: var(--bgColor-muted, #161b22);
+  background-color: transparent;
   color: var(--fgColor-default, #e6edf3);
   border: 1px solid var(--borderColor-default, #30363d);
-  border-radius: 6px;
-  padding: 4px 28px 4px 10px;
+  border-radius: 20px;
+  padding: 6px 32px 6px 32px;
   font-size: 13px;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23848d97'%3E%3Cpath d='M6 8.5L1.5 4h9L6 8.5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 8px center;
+  background-position: right 12px center;
   min-width: 140px;
+  transition: border-color 0.15s ease;
 }
 
 .branchSelect:hover {
-  border-color: var(--borderColor-accent-emphasis, #1f6feb);
+  border-color: var(--fgColor-muted, #848d97);
 }
 
 .branchSelect:focus-visible {
@@ -149,17 +194,39 @@
 .author {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   margin-top: 6px;
 }
 
+.authorAvatars {
+  display: flex;
+  flex-direction: row;
+}
+
+.authorAvatars:hover .authorAvatar {
+  margin-left: 2px;
+}
+
+.authorAvatars:hover .authorAvatar:first-child {
+  margin-left: 0;
+}
+
 .authorAvatar {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
+  margin-left: -6px;
+  transition: margin-left 0.15s ease;
+  outline: 2px solid var(--bgColor-default, #0d1117);
+  position: relative;
+}
+
+.authorAvatar:first-child {
+  margin-left: 0;
 }
 
 .authorName {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--fgColor-muted, #848d97);
+  letter-spacing: 0.01em;
 }

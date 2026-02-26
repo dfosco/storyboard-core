@@ -90,8 +90,10 @@ function getCurrentBranch(basePath) {
  * @param {Record<string, unknown>} props.pageModules - import.meta.glob result for page files
  * @param {string} [props.basePath] - Base URL path (defaults to import.meta.env.BASE_URL)
  * @param {string} [props.title] - Header title (defaults to "Viewfinder")
+ * @param {string} [props.subtitle] - Optional subtitle displayed below the title
+ * @param {boolean} [props.showThumbnails] - Show thumbnail previews (defaults to false)
  */
-export default function Viewfinder({ scenes = {}, pageModules = {}, basePath, title = 'Viewfinder' }) {
+export default function Viewfinder({ scenes = {}, pageModules = {}, basePath, title = 'Viewfinder', subtitle, showThumbnails = false }) {
   const [branches, setBranches] = useState(null)
 
   const sceneNames = useMemo(() => Object.keys(scenes), [scenes])
@@ -110,13 +112,19 @@ export default function Viewfinder({ scenes = {}, pageModules = {}, basePath, ti
 
   const currentBranch = useMemo(() => getCurrentBranch(basePath), [basePath])
 
+  const MOCK_BRANCHES = useMemo(() => [
+    { branch: 'main', folder: '' },
+    { branch: 'feat/comments-v2', folder: 'branch--feat-comments-v2' },
+    { branch: 'fix/nav-overflow', folder: 'branch--fix-nav-overflow' },
+  ], [])
+
   useEffect(() => {
     const url = `${branchBasePath}branches.json`
     fetch(url)
-      .then(r => r.ok ? r.json() : [])
-      .then(data => setBranches(Array.isArray(data) ? data : []))
-      .catch(() => setBranches([]))
-  }, [branchBasePath])
+      .then(r => r.ok ? r.json() : null)
+      .then(data => setBranches(Array.isArray(data) && data.length > 0 ? data : MOCK_BRANCHES))
+      .catch(() => setBranches(MOCK_BRANCHES))
+  }, [branchBasePath, MOCK_BRANCHES])
 
   const handleBranchChange = (e) => {
     const folder = e.target.value
@@ -129,15 +137,21 @@ export default function Viewfinder({ scenes = {}, pageModules = {}, basePath, ti
     <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.headerTop}>
-          <h1 className={styles.title}>{title}</h1>
+          <div>
+            <h1 className={styles.title}>{title}</h1>
+            {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+          </div>
           {branches && branches.length > 0 && (
             <div className={styles.branchDropdown}>
-              <label className={styles.branchLabel} htmlFor="branch-select">Branch</label>
+              <svg className={styles.branchIcon} width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path d="M9.5 3.25a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.492 2.492 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25Zm-6 0a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Zm8.25-.75a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5ZM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z" />
+              </svg>
               <select
                 id="branch-select"
                 className={styles.branchSelect}
                 defaultValue=""
                 onChange={handleBranchChange}
+                aria-label="Switch branch"
               >
                 <option value="" disabled>{currentBranch}</option>
                 {branches.map((b) => (
@@ -149,7 +163,7 @@ export default function Viewfinder({ scenes = {}, pageModules = {}, basePath, ti
             </div>
           )}
         </div>
-        <p className={styles.subtitle}>
+        <p className={styles.sceneCount}>
           {sceneNames.length} scene{sceneNames.length !== 1 ? 's' : ''}
         </p>
       </header>
@@ -158,27 +172,37 @@ export default function Viewfinder({ scenes = {}, pageModules = {}, basePath, ti
         <p className={styles.empty}>No scenes found. Add a <code>*.scene.json</code> file to get started.</p>
       ) : (
         <section>
-          <h2 className={styles.sectionTitle}>Scenes</h2>
-          <div className={styles.grid}>
+          {/* <h2 className={styles.sectionTitle}>Scenes</h2> */}
+          <div className={showThumbnails ? styles.grid : styles.list}>
             {sceneNames.map((name) => {
               const meta = getSceneMeta(name)
               return (
-                <a key={name} href={resolveSceneRoute(name, knownRoutes)} className={styles.card}>
-                  <div className={styles.thumbnail}>
-                    <PlaceholderGraphic name={name} />
-                  </div>
+                <a key={name} href={resolveSceneRoute(name, knownRoutes)} className={showThumbnails ? styles.card : styles.listItem}>
+                  {showThumbnails && (
+                    <div className={styles.thumbnail}>
+                      <PlaceholderGraphic name={name} />
+                    </div>
+                  )}
                   <div className={styles.cardBody}>
                     <p className={styles.sceneName}>{name}</p>
-                    {meta?.author && (
-                      <div className={styles.author}>
-                        <img
-                          src={`https://github.com/${meta.author}.png?size=32`}
-                          alt={meta.author}
-                          className={styles.authorAvatar}
-                        />
-                        <span className={styles.authorName}>{meta.author}</span>
-                      </div>
-                    )}
+                    {meta?.author && (() => {
+                      const authors = Array.isArray(meta.author) ? meta.author : [meta.author]
+                      return (
+                        <div className={styles.author}>
+                          <span className={styles.authorAvatars}>
+                            {authors.map((a) => (
+                              <img
+                                key={a}
+                                src={`https://github.com/${a}.png?size=32`}
+                                alt={a}
+                                className={styles.authorAvatar}
+                              />
+                            ))}
+                          </span>
+                          <span className={styles.authorName}>{authors.join(', ')}</span>
+                        </div>
+                      )
+                    })()}
                   </div>
                 </a>
               )
