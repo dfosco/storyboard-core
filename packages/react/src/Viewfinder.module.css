@@ -11,15 +11,15 @@
 }
 
 .title {
-  font-size: 36px;
-  font-weight: 700;
+  font-size: 48px;
+  font-weight: 800;
   margin: 0 0 8px;
   color: var(--fgColor-default, #e6edf3);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
 }
 
 .subtitle {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--fgColor-muted, #848d97);
   margin: 0;
 }
@@ -35,50 +35,37 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 1px;
   max-width: 960px;
   margin: 0 auto;
-  border: 1px solid var(--borderColor-default, #30363d);
-  border-radius: 8px;
-  overflow: hidden;
 }
 
 .listItem {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 16px;
-  background: var(--bgColor-muted, #161b22);
+  display: block;
+  padding: 16px 0;
   text-decoration: none;
   color: inherit;
-  transition: background-color 0.15s ease;
-  border-bottom: 1px solid var(--borderColor-default, #30363d);
+  border-bottom: 1px solid var(--borderColor-muted, #21262d);
 }
 
-.listItem:last-child {
-  border-bottom: none;
+.listItem:first-child {
+  border-top: 1px solid var(--borderColor-muted, #21262d);
 }
 
 .listItem:hover {
-  background: var(--bgColor-inset, #010409);
   text-decoration: none !important;
 }
 
-.listItem .cardBody {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0;
-  border-top: none;
-  flex: 1;
+.listItem:hover .sceneName {
+  color: var(--fgColor-accent, #58a6ff);
 }
 
-.listItem .sceneName {
-  flex-shrink: 0;
+.listItem .cardBody {
+  padding: 0;
+  border-top: none;
 }
 
 .listItem .author {
-  margin-top: 0;
+  margin-top: 4px;
 }
 
 .card {
@@ -124,10 +111,12 @@
 }
 
 .sceneName {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   color: var(--fgColor-default, #e6edf3);
   margin: 0;
+  letter-spacing: -0.02em;
+  transition: color 0.15s ease;
 }
 
 .empty {
@@ -140,12 +129,12 @@
 }
 
 .sectionTitle {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--fgColor-muted, #848d97);
-  margin: 0 auto 12px;
+  margin: 0 auto 16px;
   max-width: 960px;
 }
 
