@@ -13,7 +13,6 @@
 .title {
   font-size: 72px;
   font-weight: 400;
-  /* font-style: italic; */
   margin: 0 0 12px;
   color: var(--fgColor-default, #e6edf3);
   letter-spacing: -0.03em;
@@ -23,7 +22,14 @@
 .subtitle {
   font-size: 15px;
   color: var(--fgColor-muted, #848d97);
-  margin: 0;
+  margin: 4px 0 0;
+  letter-spacing: 0.01em;
+}
+
+.sceneCount {
+  font-size: 13px;
+  color: var(--fgColor-muted, #848d97);
+  margin: 16px 0 0;
   letter-spacing: 0.01em;
 }
 
@@ -44,23 +50,18 @@
 
 .listItem {
   display: block;
-  padding: 20px 0;
+  padding: 8px 0;
   text-decoration: none;
   color: inherit;
-  border-bottom: 1px solid var(--borderColor-muted, #21262d);
+  /* border-bottom: 1px solid var(--borderColor-muted, #21262d); */
 }
 
 .listItem:first-child {
-  border-top: 1px solid var(--borderColor-muted, #21262d);
+  /* border-top: 1px solid var(--borderColor-muted, #21262d); */
 }
 
 .listItem:hover {
   text-decoration: none !important;
-}
-
-.listItem .cardBody {
-  padding: 0;
-  border-top: none;
 }
 
 .listItem .author {
@@ -106,7 +107,10 @@
 
 .cardBody {
   padding: 12px 16px;
-  border-top: 1px solid var(--borderColor-default, #30363d);
+
+  &:hover {
+    background-color: var(--bgColor-muted);
+  }
 }
 
 .sceneName {
@@ -148,37 +152,38 @@
 .branchDropdown {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0;
   flex-shrink: 0;
+  position: relative;
 }
 
-.branchLabel {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+.branchIcon {
+  position: absolute;
+  left: 10px;
   color: var(--fgColor-muted, #848d97);
-  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .branchSelect {
   appearance: none;
-  background-color: var(--bgColor-muted, #161b22);
+  background-color: transparent;
   color: var(--fgColor-default, #e6edf3);
   border: 1px solid var(--borderColor-default, #30363d);
-  border-radius: 6px;
-  padding: 4px 28px 4px 10px;
+  border-radius: 20px;
+  padding: 6px 32px 6px 32px;
   font-size: 13px;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23848d97'%3E%3Cpath d='M6 8.5L1.5 4h9L6 8.5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 8px center;
+  background-position: right 12px center;
   min-width: 140px;
+  transition: border-color 0.15s ease;
 }
 
 .branchSelect:hover {
-  border-color: var(--borderColor-accent-emphasis, #1f6feb);
+  border-color: var(--fgColor-muted, #848d97);
 }
 
 .branchSelect:focus-visible {
