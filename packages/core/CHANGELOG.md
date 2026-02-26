@@ -1,5 +1,11 @@
 # @dfosco/storyboard-core
 
+## 1.16.0
+
+### Minor Changes
+
+-   Improve design and customization on viewfinder home
+
 ## 1.15.2
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @dfosco/storyboard-react-primer
 
+## 1.16.0
+
+### Minor Changes
+
+-   Improve design and customization on viewfinder home
+
+### Patch Changes
+
+-   Updated dependencies
+    -   @dfosco/storyboard-react@1.16.0
+
 ## 1.15.2
 
 ### Patch Changes
