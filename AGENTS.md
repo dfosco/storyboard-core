@@ -9,6 +9,8 @@
 
 ## Skills
 
+- **Frontend Design** (`.github/skills/frontend-design/SKILL.md`) — Skill for implementing great designs based on instructions. Always use it when implementing frontend -- but defer to other skills if they have overlapping advice. **This is the general skill for frontend design.**
+
 - **Primer Builder** (`.github/skills/primer-screenshot-builder/primer-screenshot-builder.md`) — Self-contained skill for converting screenshots or UI descriptions into working Primer React pages. Includes page archetypes with JSX scaffolding, build rules, inline component and token references, scene data structuring, and visual fidelity checklist. **This is the primary skill for screenshot-to-code workflows.**
 
 - **Primer Primitives** (`.github/skills/primer-primitives/primer-primitives.md`) — Complete reference of all `@primer/primitives` CSS design tokens. **Only consult when you need tokens not covered by the Primer Builder's inline token tables** (e.g., motion, controls, overlays, breakpoints, component-specific colors).

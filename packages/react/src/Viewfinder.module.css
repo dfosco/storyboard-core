@@ -1,47 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap');
+
 .container {
   min-height: 100vh;
   background-color: var(--bgColor-default, #0d1117);
   color: var(--fgColor-default, #e6edf3);
-  padding: 48px 32px;
+  padding: 80px 32px 48px;
 }
 
 .header {
-  max-width: 960px;
-  margin: 0 auto 40px;
+  max-width: 720px;
+  margin: 0 auto 64px;
 }
 
 .title {
-  font-size: 48px;
-  font-weight: 800;
-  margin: 0 0 8px;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 72px;
+  font-weight: 400;
+  font-style: italic;
+  margin: 0 0 12px;
   color: var(--fgColor-default, #e6edf3);
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
+  line-height: 1;
 }
 
 .subtitle {
-  font-size: 16px;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-size: 15px;
   color: var(--fgColor-muted, #848d97);
   margin: 0;
+  letter-spacing: 0.01em;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 16px;
-  max-width: 960px;
+  max-width: 720px;
   margin: 0 auto;
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  max-width: 960px;
+  max-width: 720px;
   margin: 0 auto;
 }
 
 .listItem {
   display: block;
-  padding: 16px 0;
+  padding: 20px 0;
   text-decoration: none;
   color: inherit;
   border-bottom: 1px solid var(--borderColor-muted, #21262d);
@@ -56,7 +63,7 @@
 }
 
 .listItem:hover .sceneName {
-  color: var(--fgColor-accent, #58a6ff);
+  font-style: italic;
 }
 
 .listItem .cardBody {
@@ -65,7 +72,7 @@
 }
 
 .listItem .author {
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
 .card {
@@ -111,31 +118,35 @@
 }
 
 .sceneName {
-  font-size: 20px;
-  font-weight: 700;
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 28px;
+  font-weight: 400;
   color: var(--fgColor-default, #e6edf3);
   margin: 0;
   letter-spacing: -0.02em;
-  transition: color 0.15s ease;
+  line-height: 1.2;
+  transition: font-style 0.15s ease;
 }
 
 .empty {
   text-align: center;
   padding: 80px 24px;
   color: var(--fgColor-muted, #848d97);
-  font-size: 14px;
-  max-width: 960px;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-size: 15px;
+  max-width: 720px;
   margin: 0 auto;
 }
 
 .sectionTitle {
-  font-size: 14px;
-  font-weight: 800;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   color: var(--fgColor-muted, #848d97);
-  margin: 0 auto 16px;
-  max-width: 960px;
+  margin: 0 auto 20px;
+  max-width: 720px;
 }
 
 .headerTop {
@@ -153,8 +164,11 @@
 }
 
 .branchLabel {
-  font-size: 12px;
-  font-weight: 500;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--fgColor-muted, #848d97);
   white-space: nowrap;
 }
@@ -187,7 +201,7 @@
 .author {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   margin-top: 6px;
 }
 
@@ -205,8 +219,8 @@
 }
 
 .authorAvatar {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   margin-left: -6px;
   transition: margin-left 0.15s ease;
@@ -219,6 +233,8 @@
 }
 
 .authorName {
+  font-family: 'DM Sans', -apple-system, sans-serif;
   font-size: 13px;
   color: var(--fgColor-muted, #848d97);
+  letter-spacing: 0.01em;
 }
