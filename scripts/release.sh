@@ -30,4 +30,28 @@ npx changeset publish
 echo "⬆️  Pushing with tags..."
 git push --follow-tags
 
+echo "📢 Creating GitHub Release..."
+
+VERSION=$(node -p "require('./packages/core/package.json').version")
+TAG="@dfosco/storyboard-core@${VERSION}"
+TITLE="v${VERSION}"
+CHANGELOG="packages/core/CHANGELOG.md"
+
+if gh release view "$TAG" &>/dev/null; then
+  echo "  ⏭️  ${TITLE} release already exists, skipping"
+else
+  NOTES=$(awk -v ver="## ${VERSION}" '
+    $0 ~ ver { found=1; next }
+    found && /^## / { exit }
+    found { print }
+  ' "$CHANGELOG")
+
+  if [ -n "$NOTES" ]; then
+    echo "$NOTES" | gh release create "$TAG" --title "$TITLE" --notes-file -
+  else
+    gh release create "$TAG" --title "$TITLE" --generate-notes
+  fi
+  echo "  ✅ Created release ${TITLE}"
+fi
+
 echo "✅ Release complete!"

@@ -184,9 +184,15 @@ Once the version PR is merged, the same action runs `changeset publish`, which p
 
 ---
 
-## Manual publish (fallback)
+## Manual publish (recommended)
 
-If the GitHub Action fails or you need to publish manually:
+Use the release script which runs lint, tests, build, publishes to npm, and creates GitHub Releases:
+
+```bash
+./scripts/release.sh
+```
+
+Or run each step manually:
 
 ```bash
 npm login
@@ -194,6 +200,12 @@ npx changeset version   # bump versions locally
 git add -A && git commit -m "chore: version packages"
 npx changeset publish   # publish to npm
 git push --follow-tags
+
+# Create GitHub Releases from the new tags (requires gh CLI)
+for pkg in core react react-primer react-reshaped; do
+  TAG="@dfosco/storyboard-${pkg}@$(node -p "require('./packages/${pkg}/package.json').version")"
+  gh release create "$TAG" --title "$TAG" --generate-notes
+done
 ```
 
 ---
