@@ -169,16 +169,24 @@ export default function Viewfinder({ scenes = {}, pageModules = {}, basePath, ti
                   </div>
                   <div className={styles.cardBody}>
                     <p className={styles.sceneName}>{name}</p>
-                    {meta?.author && (
-                      <div className={styles.author}>
-                        <img
-                          src={`https://github.com/${meta.author}.png?size=32`}
-                          alt={meta.author}
-                          className={styles.authorAvatar}
-                        />
-                        <span className={styles.authorName}>{meta.author}</span>
-                      </div>
-                    )}
+                    {meta?.author && (() => {
+                      const authors = Array.isArray(meta.author) ? meta.author : [meta.author]
+                      return (
+                        <div className={styles.author}>
+                          <span className={styles.authorAvatars}>
+                            {authors.map((a) => (
+                              <img
+                                key={a}
+                                src={`https://github.com/${a}.png?size=32`}
+                                alt={a}
+                                className={styles.authorAvatar}
+                              />
+                            ))}
+                          </span>
+                          <span className={styles.authorName}>{authors.join(', ')}</span>
+                        </div>
+                      )
+                    })()}
                   </div>
                 </a>
               )

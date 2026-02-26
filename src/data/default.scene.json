@@ -1,7 +1,7 @@
 {
   "sceneMeta": {
     "route": "/example",
-    "author": "dfosco"
+    "author": ["dfosco", "heyamie", "branonconor"]
   },
   "user": { "$ref": "jane-doe" },
   "navigation": { "$ref": "navigation" },

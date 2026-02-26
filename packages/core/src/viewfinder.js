@@ -53,7 +53,7 @@ export function resolveSceneRoute(sceneName, knownRoutes = []) {
  * Get sceneMeta for a scene (route, author, etc).
  *
  * @param {string} sceneName
- * @returns {{ route?: string, author?: string } | null}
+ * @returns {{ route?: string, author?: string | string[] } | null}
  */
 export function getSceneMeta(sceneName) {
   try {

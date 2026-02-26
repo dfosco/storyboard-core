@@ -153,10 +153,31 @@
   margin-top: 6px;
 }
 
+.authorAvatars {
+  display: flex;
+  flex-direction: row;
+}
+
+.authorAvatars:hover .authorAvatar {
+  margin-left: 2px;
+}
+
+.authorAvatars:hover .authorAvatar:first-child {
+  margin-left: 0;
+}
+
 .authorAvatar {
   width: 16px;
   height: 16px;
   border-radius: 50%;
+  margin-left: -6px;
+  transition: margin-left 0.15s ease;
+  outline: 2px solid var(--bgColor-default, #0d1117);
+  position: relative;
+}
+
+.authorAvatar:first-child {
+  margin-left: 0;
 }
 
 .authorName {
