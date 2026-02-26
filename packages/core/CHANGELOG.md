@@ -1,5 +1,11 @@
 # @dfosco/storyboard-core
 
+## 1.15.2
+
+### Patch Changes
+
+-   Update release pipeline
+
 ## 1.15.1
 
 ### Patch Changes
