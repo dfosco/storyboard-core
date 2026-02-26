@@ -11,15 +11,15 @@
 }
 
 .title {
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 36px;
+  font-weight: 700;
   margin: 0 0 8px;
   color: var(--fgColor-default, #e6edf3);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 .subtitle {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--fgColor-muted, #848d97);
   margin: 0;
 }
@@ -30,6 +30,55 @@
   gap: 16px;
   max-width: 960px;
   margin: 0 auto;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-width: 960px;
+  margin: 0 auto;
+  border: 1px solid var(--borderColor-default, #30363d);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: var(--bgColor-muted, #161b22);
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid var(--borderColor-default, #30363d);
+}
+
+.listItem:last-child {
+  border-bottom: none;
+}
+
+.listItem:hover {
+  background: var(--bgColor-inset, #010409);
+  text-decoration: none !important;
+}
+
+.listItem .cardBody {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border-top: none;
+  flex: 1;
+}
+
+.listItem .sceneName {
+  flex-shrink: 0;
+}
+
+.listItem .author {
+  margin-top: 0;
 }
 
 .card {
@@ -75,8 +124,8 @@
 }
 
 .sceneName {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--fgColor-default, #e6edf3);
   margin: 0;
 }
@@ -91,8 +140,8 @@
 }
 
 .sectionTitle {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--fgColor-muted, #848d97);
@@ -181,6 +230,6 @@
 }
 
 .authorName {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--fgColor-muted, #848d97);
 }

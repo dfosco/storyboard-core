@@ -90,8 +90,9 @@ function getCurrentBranch(basePath) {
  * @param {Record<string, unknown>} props.pageModules - import.meta.glob result for page files
  * @param {string} [props.basePath] - Base URL path (defaults to import.meta.env.BASE_URL)
  * @param {string} [props.title] - Header title (defaults to "Viewfinder")
+ * @param {boolean} [props.showThumbnails] - Show thumbnail previews (defaults to false)
  */
-export default function Viewfinder({ scenes = {}, pageModules = {}, basePath, title = 'Viewfinder' }) {
+export default function Viewfinder({ scenes = {}, pageModules = {}, basePath, title = 'Viewfinder', showThumbnails = false }) {
   const [branches, setBranches] = useState(null)
 
   const sceneNames = useMemo(() => Object.keys(scenes), [scenes])
@@ -159,14 +160,16 @@ export default function Viewfinder({ scenes = {}, pageModules = {}, basePath, ti
       ) : (
         <section>
           <h2 className={styles.sectionTitle}>Scenes</h2>
-          <div className={styles.grid}>
+          <div className={showThumbnails ? styles.grid : styles.list}>
             {sceneNames.map((name) => {
               const meta = getSceneMeta(name)
               return (
-                <a key={name} href={resolveSceneRoute(name, knownRoutes)} className={styles.card}>
-                  <div className={styles.thumbnail}>
-                    <PlaceholderGraphic name={name} />
-                  </div>
+                <a key={name} href={resolveSceneRoute(name, knownRoutes)} className={showThumbnails ? styles.card : styles.listItem}>
+                  {showThumbnails && (
+                    <div className={styles.thumbnail}>
+                      <PlaceholderGraphic name={name} />
+                    </div>
+                  )}
                   <div className={styles.cardBody}>
                     <p className={styles.sceneName}>{name}</p>
                     {meta?.author && (() => {
